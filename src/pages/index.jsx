@@ -397,12 +397,14 @@ function Photos() {
 }
 
 export default function Home({ articles }) {
+
   return (
     <>
       <Head>
         <title>
           Nathan Galindo - Software developer, researcher, and guitarist.
         </title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐻</text></svg>" />
         <meta
           name="description"
           content="I’m Spencer, a software designer and entrepreneur based in New York City. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms."

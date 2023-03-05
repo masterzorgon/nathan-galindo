@@ -1,0 +1,56 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2022-03-13',
+  title: 'Hash Functions',
+  tag: "blockchain",
+  description:
+    'According to Silvio Micali in an interview with Lex Fridman, the hash function is one of the most beautiful utilities in mathematics and computer science (paraphrasing). This article is a brief conceptual introduction to hash cryptography and its applications in blockchain',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## What is a hash function?
+A hash is described as a **one-way mathematical function**, meaning that it is very easy to calculate but nearly impossible to reverse. Think of it like breaking a glass window: it is quite easy to break a window, and extremely hard to put the window back together after the fact. 
+
+One of the most secure and trusted hashing algorithms is the [SHA256](https://emn178.github.io/online-tools/sha256.html) hash function. It was developed by the NSA and is the hashing algorithm used by the Bitcoin protocol.
+
+
+## Utility of a hash function
+Hash functions are basically designed to take an input of arbitrary length, and produce a unique output of fixed length. For every given input, the hash function should produce a given output. 
+
+In this, if I fed `Nathan Galindo` into the SHA256 algorithm and received  `e5d998259dfba08a7bc0493b972b3d744fedaf3cd7ad0a049f3e2f7311564862` as the response, I now know that is the fixed representation of my name according to the SHA256 algorithm — this value will never change for the specified input, and can never be replicated with any other output.
+
+In this, hash functions server two main purposes
+- To **obfuscate** data: hash functions are useful for concealing the true value of sensitive data. 
+- To **identify** data: since hash functions produce a fixed and unique output for a given input, they basically serve as numeric ID's for digital data.
+
+It is important to note that <u>not all hashing algorithms are made the same</u>. There are many hashing algorithms that have been compromised by hackers and are no longer considered secure, such as the [MD5](https://en.wikipedia.org/wiki/MD5#:~:text=On%2031%20December%202008%2C%20the,the%20Flame%20malware%20in%202012.). As a matter of fact, there is an ongoing race to produce a class of quantum-proof hashing algorithms given the inevitability of quantum computers.
+
+
+## Properties of a hash
+A good hashing algorithm should have the following features
+- Easy and fast to perform a calculation with
+- Impossible or extremely difficult to reverse the calculation to its original value
+- Output a unique value for any input provided
+- The value of the output should dramatically change with even a minute change to the input
+
+
+## How hashes are used in blockchain
+Without the hash function, blockchain technology would not be possible. This is because a blockchain is a **chain of blocks** which are linked together in subsequent order using the output of the hash function. Let me elaborate...
+
+In order to organize blocks of data in a chain sequence, each block must have 3 pieces of information (blocks contain more information than this, however):
+- The block number: the position of the block in the chain
+- The current block hash: the hash value of all the block's data
+- The previous block's hash: the hash value of the value which comes immediately before 
+
+When you start a new blockchain, you at first have the **genesis block**, which has the position of `0`. When you want to chain the next block into position `1`, you must include the hash value of block `0` with block `1`. This way, block `1` points directly to the block preceding it. When you repeat this pattern for every subsequent block, you end up with a chain of blocks each with pointers to the block that came immediately before.
+
+Remember how I mentioned that any minute change to the input value of a hash function would drastically change the hash function's output? That means if anyone were to ever manipulate the data of any block, their edits to the data would alter the block's hash value. Since each blocked is linked to the preceding block by their hash output, this altering of the block's hash would break the blockchain, exposing that there was an altering of the data. 
+
+---
+## References
+
+Please refer to [Brownworth's website](https://andersbrownworth.com/blockchain/hash) for a more hand-on explanation.

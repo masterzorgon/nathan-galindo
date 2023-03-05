@@ -130,7 +130,7 @@ The `Option<T>` enum is excellent for when you want to call a method that might 
 <aside>
 🤔 **Fun Fact**
 
-Rust does not run any slower when we use generic types. This is accomplished through *monomorphization*, where the generic code is turned into specific code by filling in the concrete types at compile time.
+> Rust does not run any slower when we use generic types. This is accomplished through *monomorphization*, where the generic code is turned into specific code by filling in the concrete types at compile time.
 
 </aside>
 
@@ -325,7 +325,7 @@ The Rust compiler uses a set of rules called the *Elision Rules* to determine wh
 <aside>
 🤔 **Fun Fact**
 
-The core Rust team is constantly observing Rust community code to determine if there are any deterministic patters where the compiler can automatically infer the lifetime of our references.
+> The core Rust team is constantly observing Rust community code to determine if there are any deterministic patters where the compiler can automatically infer the lifetime of our references.
 
 That being said, as the Rust programming language matures, it is entirely possible that we will need to explicitly annotate our lifetimes less and less.
 
@@ -396,11 +396,3 @@ fn main() {
 ```
 
 Typically, we separate modules into their own files named after themselves. In practice, it is best to create an entire folder dedicated to some specific function or type definitions and include a `[mod.rs](http://mod.rs)` file that will modularize the code and make it public for the rest of your code to access.
-
-![Screen Shot 2023-01-20 at 10.45.58 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.45.58_AM.png)
-
-![Screen Shot 2023-01-20 at 10.49.19 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.49.19_AM.png)
-
-Importing this modularized functionality into other files would look something like the following. You declare module using the `pub mod` syntax, then access its contents using the `use` keyword.
-
-![Screen Shot 2023-01-20 at 10.54.53 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.54.53_AM.png)

@@ -406,8 +406,8 @@ export default function Home({ articles }) {
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
             I'm Nathan Galindo, an Honors student at Baylor University. I'm a
-            full-stack software developer with a passion for blockchain technology and
-            an interest in shaping the future of financial services.
+            full-stack software developer who is interested in leveraging blockchain technology
+            to shape the future of financial services.
           </p>
           <div className="mt-6 flex gap-6">
             <SocialLink

@@ -1,0 +1,132 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2022-02-08',
+  title: 'Pentesting with FFUF',
+  tag: "cybersecurity",
+  description:
+    'When pentesting a web application, enumeration is first and foremost. This article teaches you how to use FFUF to reveal the complete file architecture of your target website in order to discover vulnerable services.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## What is FFUF
+FFUF is a content discovery tool that finds vulnerable end points using wordlists. 
+
+Syntax:
+> `ffuf -u [target ip]/FUZZ/ -w [wordlist path]`
+
+Make sure to **insert the `FUZZ` keyword into the URL or IP path to tell FFUF which parameters you want to brute force**. FFUF will then run fuzz this endpoint and return the HTTP responses.
+
+## Using recursion
+Recursion, in the simplest terms, is doing the same thing over and over again. In the context of FFUF, we can use recursion to fuzz the specific endpoints that responded to our initial scan.
+
+There are two recursion flags in FFUF:
+* `-recursion`: Signifies that recursion will be performed.
+* `-recursion-depth`: Signifies how many times recursion will be performed.
+
+Example:
+> `ffuf -u [target ip]/FUZZ -w [wordlist path] -recursion`
+
+Notice how we did not include an ending slash `/` when we inserted our `FUZZ` parameter. This is because *you cannot append anything to the end of `FUZZ` when performing recursion*.
+
+We can also use recursion to **search for particular file extensions by adding the `-e` flag**.
+
+Example:
+> `ffuf -u [target ip]/FUZZ -w [wordlist path] -e .bak`
+
+Above, we are recursively looking for any files with the `.bak` extension. We include the `.` because FFUF is simply adding the `.bak` extension to every item in our wordlist that we are using to fuzz for content.
+
+## Silent mode
+Using silent mode **`-s` tells FFUF to print *only* the results from our scan**.
+
+We can also pipe `|` our output to `tee` to stream our results to the console whilst also outputting our results into a file.
+
+Example:
+> `ffuf -u [target ip]/FUZZ -w [wordlist path] -s | tee ./[output file]`
+
+Above, we are able to actively read our results in the console, but we are also creating a file with all of our results for future reference.
+
+## Adding a delay
+The good thing about FFUF is that it is *very* fast. The bad thing is that it is *very* fast... In an instance that we are limited to a certain number of requests per second, we can **limit the speed of our requests with the `-rate` flag**.
+
+Example:
+> `ffuf -u [target ip]/FUZZ/ -w [wordlist path] -rate 100`
+
+Above, we are limiting our request rate to 100 requests per second.
+
+## Filters and Matchers
+Because not all websites will return appropriate [[HTTP responses (200 OK, 404 error, etc.), we can **include filters and matchers to sift out the nonsense** results from our scans.
+
+**Filters**
+* Removes requests/responses which *match* the filter.
+* Use this if you know what you want to *remove*.
+
+**Matcher**
+* Removes requests/responses which *do not match* the matcher.
+* Use this if you know what you want to *keep*.
+
+Example:
+> `fuff -u [target ip]/FUZZ/ -w [wordlist path] -fw 1`
+
+Above, we are removing all responses that have only one word.
+
+To view the various `filter` and `match` options, reference the commands below:
+
+> `ffuf -h | grep 'Filter'`
+> or
+> `ffuf -h | grep 'Match'`
+
+You can simply insert the above commands into your terminal.
+
+### Caveat
+However, **sometimes 200 OK responses do not always indicate that something has worked**. Especially with some error messages, the length might not be consistent to match on.
+
+For this reason, we can **use the `-fr` filter flag to exclude faulty responses** using the following:
+> `fuff -u [target ip]/FUZZ/ -w [wordlist path] -fr "not found"`
+
+The command above filters out any responses that contain the text "not found". This is *very* useful for dealing with false positives.
+
+## Dealing with form data
+We can **fuzz POST data** by including the `FUZZ` keyword into our POST request. 
+
+Example:
+> `ffuf -w [wordlist path] -X POST -d "username=admin&password=FUZZ" -u [target ip]`
+* `-X`: Signifies which [[HTTP method to use.
+* `-d`: Signifies the [[HTTP request we are manipulating. 
+
+Above, we are [[brute forcing a login POST request by including `FUZZ` as the value to the `password` parameter.
+
+We can also **fuzz JSON POST data** by including the `FUZZ` keyword into our JSON POST request.
+
+Example:
+> `ffuf -w [wodlist path] -X "PUT" -u [target ip] -H "Content-Type: application/json" -d "{'FUZZ':'test'}"`
+* `-H`: Allows us to add a Header to our JSON POST request.
+
+This feature allows us to pentest API endpoints.
+
+## FFUF Vs. Burp Scanner
+FFUF is a [[brute forcing and [[fuzzing tool. It allows us to brute force for hidden directories and general content discovery.
+
+Example: 
+> `ffuf -w [wordlist path] -u [target ip]/FUZZ/ -o [output file] relay-proxy http://127.0.0.1:8080`
+
+* `-w`: Signifies the path to our [[fuzzing wordlist.
+* `-u`: Signifies the [[URL or IP we are targeting.
+* `/FUZZ/`: By inserting `FUZZ` into our target IP or [[URL path, we are telling FFUF where to insert the wordlists entries.
+* `relay-proxy`: Allows us to replay the working [[HTTP requests and relay them to Burp.
+
+What makes this so cool is that, when sending the vulnerable endpoints to Burp, we are then able to manipulate them using Burp's toolkit. This essentially mimics the functionality of Burpsuite Professional's Scanner.
+
+---
+
+## References
+[FFUF Results Translator Tool](https://insiderphd.dev/tools/ffuf.html)
+
+[FFUF](https://github.com/ffuf/ffuf)
+
+[How to Master FFUF](https://www.youtube.com/watch?v=iLFkxAmwXF0&list=TLPQMDgwMjIwMjJdw433uy9HMA&index=3)
+
+[How to use FFUF](https://www.youtube.com/watch?v=aN3Nayvd7FU&t=633s)

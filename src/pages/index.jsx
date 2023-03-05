@@ -397,7 +397,6 @@ function Photos() {
 }
 
 export default function Home({ articles }) {
-
   return (
     <>
       <Head>

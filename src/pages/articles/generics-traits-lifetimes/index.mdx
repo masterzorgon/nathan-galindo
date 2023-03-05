@@ -1,0 +1,406 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2023-01-09',
+  title: 'Rust Generics, Traits, and Lifetimes',
+  tag: "programming",
+  description:
+    'The Rust programming language is a tool which allows programmers to write incredibly performant code via the use of novel features, namely: generics, traits, and lifetimes.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## Objectives
+
+> * Understand generic types, traits and lifetimes
+> * Understand modules
+
+## Generics
+
+Generics are simply stand-ins for other concrete types or properties. This way, we can express the behavior of generics without knowing what will be in their place at compile time.
+
+An example of a generic would be the `T` type in `Vec<T>` or `Option<T>`:
+
+- For `Vec<T>`, we are declaring a vector of some unknown data type, `T`.
+- For `Option<T>`, we are specifying that the `Option` enum will return a `Some` value of `T`.
+
+**Function Definitions**
+
+We use generics to create definitions for functions or structs, and then apply those definitions to concrete data types.
+
+The example below shows a function that finds the largest number in a vector in integers:
+
+```rust
+fn largest(list: &[u32]) -> u32 {
+	let mut largest = list[0];
+
+	for &num in list.iter() {
+		if num > largest {
+			largest = num;
+		}
+	}
+
+	largest
+}
+```
+
+The example below shows a function that finds the largest item n a vector, using generic types in its function definition:
+
+```rust
+use std::cmp::PartialOrd;
+
+fn generic_largest<T: PartialOrd>(list: &[T]) -> T {
+	let mut largest = list[0];
+
+	for &num in list.iter() {
+		if num > largest {
+			largest = num;
+		}
+	}
+
+	largest
+}
+```
+
+Although the `generic_largest` function definition looks nearly identical to that of `largest`, `generic_largest`'s use of the `T` generic type allows this function to be applicable to a variety of concrete data types, rather than just a vector of `u32` types.
+
+Take note of the `std::cmp::PartialOrd`. This is an example of a *trait*, and it allows us to define a generic type `T` that has the ability to be ordered. More on this later…
+
+**Struct Definitions**
+
+You can use generic types in structs for a given parameter or multiple parameters using the `<>` syntax.
+
+Below is an example of a `Coordinates` struct that uses the `T` generic type:
+
+```rust
+fn main() {
+	struct Coordinates<T> {
+		x: T,
+		y: T
+	}
+}
+```
+
+Above, we define a struct called `Coordinates` that has two parameters, `x` and `y`. Both parameters are generic over some type `T`, and both `x` and `y` have the same type.
+
+- *Why does the following example result in an error?*
+    
+    It results in an error because the function definition states that `x` and `y` both have the same data type `T`. However, we are instantiating a `Coordinates` struct using two different data types: a `u32` and `f32`.
+    
+
+```rust
+fn main() {
+	struct Coordinates<T> {
+		x: T,
+		y: T
+	}
+
+	return Coordinates { x: 1, y: 2.0 };
+}
+```
+
+Below is an example of a struct that uses generic types in its function definition, but allows the assignment of different data types to its parameters:
+
+```rust
+fn main() {
+	struct Coordinates<T, U> {
+		x: T,
+		y: U
+	}
+
+	return Coordinates { x: 5, y: 3.4 };
+}
+```
+
+To define a struct or function where its parameters use multiple data types, use multiple generic parameters. You can use as many generic parameters as you want, but the more you have the harder you code is to read.
+
+**Enum Definitions**
+
+We can define enum definitions to hold generic types in their variants. A good example of an enum that uses generic types is the `Option<T>` enum. 
+
+The `Option<T>` enum is generic over type `T` and holds two values:
+
+- `Some<T>`: holds an unspecified value of type `T`.
+- `None`: indicates the absence of a value.
+
+The `Option<T>` enum is excellent for when you want to call a method that might or might not return some kind of value. Enum definitions are also able to use multiple generic types as well.
+
+<aside>
+🤔 **Fun Fact**
+
+Rust does not run any slower when we use generic types. This is accomplished through *monomorphization*, where the generic code is turned into specific code by filling in the concrete types at compile time.
+
+</aside>
+
+## Traits
+
+Traits specify the behaviors of any given type. The behaviors of a type include the methods and functions that we can call on that type. For example: the `.floor()` method applies only to floating-point values, and cannot be used on a char. The char and a floating-point data types have different behaviors that determine that the `.floor()` method does not work for char.
+
+Traits are a way of grouping types together according to their functionalities. Traits are especially useful when we want to use a generic type `T`, but still impose some restrictions on what kind of values can inhabit `T`.
+
+**Trait Implementations**
+
+We declare a trait using the `trait` keyword. Below, we define a trait called `Summary` for two different structs (`Tweet` and `Article`) that both use `String` data:
+
+```rust
+fn main() {
+	// defining default behavior for a trait
+	pub trait Summary {
+		fn summarize_content(&self) -> String;
+
+		// default implementations can call other methods
+		fn summarize(&self) -> String {
+			format!("Content: {}", self.summarize_content())
+		}
+	}
+
+	pub struct Article {
+		pub headline: String,
+		pub author: String,
+		pub content: String
+	}
+
+	// syntax for implementing a trait on a struct
+	impl Summary for Article {
+		fn summarize_author(&self) -> String {
+			format!("{}", self.author)
+		}
+	}
+
+	pub struct Tweet {
+		pub author: String,
+		pub content: String
+	}
+
+	// syntax for implementing a trait on a struct
+	impl Summary for Tweet {
+		fn summarize_author(&self) -> String {
+			format!("{}", self.author)
+		}
+	}
+
+	let tweet = Tweet {
+		author: String::from("nathanzebedee"),
+		content: String::from("this is a tweet")
+	};
+
+	tweet.summarize();
+}
+```
+
+Above, we are declaring a trait with default behaviors: `summarize` and `summarize_author`. It is important to note that default implementations (`summarize`) can call other methods in the same trait (`summarize_author`), even if those methods do not have default implementations. In our example, the `summarize` method has a default implementation that calls the `summarize_author` method. In this example, we only need to define `summarize_author` when we implement the trait on a type.
+
+Implementing a trait on a type differs from implementing regular methods in the way that you must declare the trait name (`Summary`), use the `for` keyword, and then specify the name of the type we want to to implement the trait for (`Tweet`, or `Article`).
+
+**Trait Bounds**
+
+Trait bounds are constraints on our generic types that insists they adhere to certain traits or behaviors defined by the programmer.
+
+In an earlier example, you saw the use of the `std::cmp::PartialOrd` trait bound which restricted our generic type `T` from being any type that does not implement the `PartialOrd` trait. 
+
+We place trait bounds with a declaration of the generic type, after a colon and inside angle brackets:
+
+```rust
+fn example_fn<T: Clone>(number: T) -> i32 {
+	// ...
+}
+```
+
+There is also an alternative syntax for declaring trait bounds in which we use the `where` clause after a function signature:
+
+```rust
+fn example_fn<T>(number: T) -> i32 where T: Clone {
+	// ...
+}
+```
+
+Whether you use the `where` clause to define your trait bounds or not is entirely up to your own preference. There is no performance difference.
+
+## Lifetimes
+
+In an earlier lesson, we discussed references (which are pointers to owned values in memory). An important detail to understand regarding references is that every reference has a *lifetime*. The lifetime of a reference simple refers to how long (and in which scope(s)) the reference is valid for. The primary goal of lifetimes is to prevent dangling references (or pointers). 
+
+Most of the time, lifetimes are implicit and do not need to be typed out. However, when the lifetimes of multiple references could be related, we must be explicit.
+
+Lifetime annotations describe the relationships of the lifetimes of multiple references to each other without affecting the lifetimes.
+
+**Syntax rules for declaring lifetime parameters**
+
+- We place lifetime parameter annotations after the `&` of a reference
+- All lifetime parameters must start with a single quote `'`.
+- The names of lifetime parameters are usually kept short.
+
+```rust
+fn main() {
+	&i32 // immutable reference
+	&'a i32 // immutable reference with an explicit lifetime
+	&'a mut i32 // mutable reference with an explicit lifetime
+}
+```
+
+- *The code example below does not yet compile. Why is this?*
+    
+    Because string slices `&str` are both references, they have lifetimes associated with them. The `longest` function receives two references, and returns one. At compile time, the compiler is unable to determine which reference will be returned. 
+    
+    In order to fix this issue, we must annotate the lifetimes of the two references in our function definition.
+    
+
+```rust
+// notice that we use `&str` in our function signature instead of `&String`.
+// `&str` is preferable because then we can use the same function on both `String` and `&str` values
+fn longest(x: &str, y: &str) -> &str {
+	if x.len() > y.len() {
+		x
+	} else {
+		y
+	}
+}
+```
+
+Below, we rewrite the function definition of `longest` using generic lifetime parameters:
+
+```rust
+fn longest<'a>(
+	x: &'a str,
+	y: &'a str
+) -> &'a str {
+	if x.len() > y.len() {
+		x
+	} else {
+		y
+	}
+}
+```
+
+In the example above, we’re not changing the lifetimes of any reference. We are simply telling the borrow checker to reject any values that do not adhere to these constraints.
+
+The `longest` function definition states the following: *for some lifetime `'a`, the function takes two references `&str`, both of which live at least as long as lifetime `'a`.*
+
+When returning a reference from a function, the lifetime parameter for a return type needs to match the lifetime parameter for one of the parameters. Lifetime syntax is about connecting the lifetimes of various parameters and return values of functions.
+
+Lifetimes on function or method parameters are called *input lifetimes*. Lifetimes on return types are called *output lifetimes*.
+
+**Lifetime Annotations in Struct Definitions**
+
+Structs can hold references as well as owned values, but we must add a lifetime to the struct definition for every reference:
+
+```rust
+pub struct Example<'a, 'b> {
+		content: &'a str,
+		author: &'b str
+	}
+
+fn main() {
+	use super::*;
+
+	let example = Example { 
+		content: "This is an example",
+		author: "nathanzebedee"
+	};
+}
+```
+
+The lifetime annotations `'a` and `'b` mean that an instance of `Example` cannot outlive the reference it holds in its `content` or `author` fields.
+
+**The Static Lifetime**
+
+The `'static` lifetime is a special lifetime in Rust which applies to all string literals, and denotes the entire duration of the program. This is because string literals are stored directly into the binary of our program, which is always available.
+
+```rust
+fn main() {
+	let string_literal: 'static str = "I am a string literal";
+}
+```
+
+**Elision Rules**
+
+The Rust compiler uses a set of rules called the *Elision Rules* to determine what lifetimes references have when there aren’t explicit annotations:
+
+1. Each parameter that is a reference gets its own lifetime.
+2. If there is exactly one input lifetime parameter, that lifetime is assigned to all output lifetime parameters.
+3. If there are multiple input lifetime parameters, but one of them is a `&self` or `&mut self`, then the lifetime of `self` is assigned to all output lifetime parameters.
+
+<aside>
+🤔 **Fun Fact**
+
+The core Rust team is constantly observing Rust community code to determine if there are any deterministic patters where the compiler can automatically infer the lifetime of our references.
+
+That being said, as the Rust programming language matures, it is entirely possible that we will need to explicitly annotate our lifetimes less and less.
+
+</aside>
+
+**All Together Now**
+
+Now, let’s view an example using generic types, traits, and lifetimes:
+
+```rust
+use std::fmt::Display;
+
+fn longest<'a, T>(x: &'a str, y: &'a str, ann: T) 
+-> &'a str where T: Display {
+	println!("Accouncement: {}", ann);
+	if x.len() > y.len() {
+		x
+	} else {
+		y
+	}
+}
+```
+
+## Modules
+
+Modules are meant to organize your code into reusable components. In the same way you extract lines of code into functions, you can extract functions into modules.
+
+A *module* is a namespace that contains definitions of functions or types, and you can choose whether those definitions are visible outside their module (`pub`) or private.
+
+**Overview Module Rules an Syntax**
+
+- To define a module, use the `mod` keyword and follow it with a name. The name should be lowercase and snake case (i.e., `module_example`).
+- Functions, types, constants, and modules are *private by default*. use the `pub` keyword to make them visible outside their namespace.
+- The `use` keyword brings modules (or the definitions inside them) into scope so it’s easier to refer to them.
+
+Below is an example of accessing a function inside a module:
+
+```rust
+pub mod module_ex {
+    pub fn example() -> String { String::from("ex") }
+}
+
+fn main() {
+		// syntax for accessing functions inside a module
+    let string_ex = module_ex::example();
+    println!("{}", string_ex);
+}
+```
+
+- *Why does the following code fail to compile?*
+    
+    Because `mod_one` exists outside the namespace of `mod_two`, we need to give `mod_two` the `use super::*` statement in order to access items in the parent scope.
+    
+
+```rust
+mod mod_one {
+    pub fn ex() -> String { String::from("ex") }
+}
+
+mod mod_two {
+    pub fn call_ex() -> String { mod_one::ex() }
+}
+
+fn main() {
+    let string_ex = mod_two::call_ex();
+    println!("{}", string_ex);
+}
+```
+
+Typically, we separate modules into their own files named after themselves. In practice, it is best to create an entire folder dedicated to some specific function or type definitions and include a `[mod.rs](http://mod.rs)` file that will modularize the code and make it public for the rest of your code to access.
+
+![Screen Shot 2023-01-20 at 10.45.58 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.45.58_AM.png)
+
+![Screen Shot 2023-01-20 at 10.49.19 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.49.19_AM.png)
+
+Importing this modularized functionality into other files would look something like the following. You declare module using the `pub mod` syntax, then access its contents using the `use` keyword.
+
+![Screen Shot 2023-01-20 at 10.54.53 AM.png](Generics,%20Traits,%20Lifetimes%20f4c55b66226d4c8aa2748f30271725df/Screen_Shot_2023-01-20_at_10.54.53_AM.png)

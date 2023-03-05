@@ -122,16 +122,21 @@ function ArrowDownIcon(props) {
 function Article({ article }) {
   return (
     <Card as="article">
-      <Card.Title href={`/articles/${article.slug}`}>
-        {article.title}
-      </Card.Title>
+      <div className='flex w-full justify-between'>
+        <Card.Title href={`/articles/${article.slug}`}>
+          {article.title}
+        </Card.Title>
+        <p className='z-10 mb-1 text-sm text-teal-500 bg-zinc-800 rounded-full pl-3 pr-3'>
+          #{article.tag}
+        </p>
+      </div>
       <Card.Eyebrow as="time" dateTime={article.date} decorate>
         {formatDate(article.date)}
       </Card.Eyebrow>
       <Card.Description>{article.description}</Card.Description>
       <Card.Cta>Read article</Card.Cta>
     </Card>
-  )
+  );
 }
 
 function SocialLink({ icon: Icon, ...props }) {

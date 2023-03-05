@@ -128,8 +128,8 @@ function Article({ article }) {
             {article.title}
           </Card.Title>
         </div>
-        <div>
-          <p className='border-2 border-transparent z-10 text-sm text-teal-500 dark:bg-zinc-800 bg-zinc-50 rounded-full px-3'>
+        <div className='z-10'>
+          <p className='border-2 border-transparent text-sm text-teal-500 dark:bg-zinc-800 bg-zinc-50 rounded-full px-3'>
             #{article.tag}
           </p>
         </div>

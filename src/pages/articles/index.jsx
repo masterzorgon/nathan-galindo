@@ -10,12 +10,16 @@ function Article({ article }) {
     <article className="md:grid md:grid-cols-4 md:items-baseline">
       <Card className="md:col-span-3">
         <div className='flex w-full justify-between'>
-          <Card.Title href={`/articles/${article.slug}`}>
-            {article.title}
-          </Card.Title>
-          {/* <p className='z-10 text-sm text-teal-500 bg-zinc-800 rounded-full px-3'>
-            #{article.tag}
-          </p> */}
+          <div>
+            <Card.Title href={`/articles/${article.slug}`}>
+              {article.title}
+            </Card.Title>
+          </div>
+          <div className='z-10'>
+            <p className='border-2 border-transparent text-sm text-teal-500 dark:bg-zinc-800 bg-zinc-50 rounded-full px-3'>
+              #{article.tag}
+            </p>
+          </div>
         </div>
         <Card.Eyebrow
           as="time"
@@ -36,7 +40,7 @@ function Article({ article }) {
         {formatDate(article.date)}
       </Card.Eyebrow>
     </article>
-  )
+  );
 }
 
 export default function ArticlesIndex({ articles }) {

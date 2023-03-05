@@ -122,7 +122,7 @@ function ArrowDownIcon(props) {
 function Article({ article }) {
   return (
     <Card as="article">
-      <div className='border-2 flex w-full justify-between'>
+      <div className='flex w-full justify-between'>
         <div>
           <Card.Title href={`/articles/${article.slug}`}>
             {article.title}

@@ -9,9 +9,14 @@ function Article({ article }) {
   return (
     <article className="md:grid md:grid-cols-4 md:items-baseline">
       <Card className="md:col-span-3">
-        <Card.Title href={`/articles/${article.slug}`}>
-          {article.title}
-        </Card.Title>
+        <div className='flex w-full justify-between'>
+          <Card.Title href={`/articles/${article.slug}`}>
+            {article.title}
+          </Card.Title>
+          <p className='mb-1 text-sm text-teal-500 bg-zinc-800 rounded-full pl-3 pr-3'>
+            #{article.tag}
+          </p>
+        </div>
         <Card.Eyebrow
           as="time"
           dateTime={article.date}

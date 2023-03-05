@@ -13,7 +13,7 @@ function Article({ article }) {
           <Card.Title href={`/articles/${article.slug}`}>
             {article.title}
           </Card.Title>
-          <p className='mb-1 text-sm text-teal-500 bg-zinc-800 rounded-full pl-3 pr-3'>
+          <p className='z-10 mb-1 text-sm text-teal-500 bg-zinc-800 rounded-full pl-3 pr-3'>
             #{article.tag}
           </p>
         </div>

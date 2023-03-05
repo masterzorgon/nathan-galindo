@@ -82,16 +82,16 @@ Every entity stored on the Solana blockchain is called an **account**. You can e
 
 All accounts have metadata that describe their status. Here are [a few fields worth remembering](https://docs.rs/anchor-lang/0.0.0-alpha.0/anchor_lang/prelude/struct.AccountInfo.html#structfield.is_signer) (Rust syntax):
 
-| Field | Description |
-| --- | --- |
-| key: &’a Pubkey | The key field contains the address to the Solana account. The address is essentially the account’s https://docs.solana.com/terminology#public-key-pubkey. It is in the form of a base58 encoded string. |
-| is_signer: bool | The is_signer field indicates whether this account has the authority to sign for a given transaction. |
-| is_writable: bool | The is_writable field indicates whether this account is able to be modified in a given transaction. |
-| lamports: &’a mut u64 | The lamports field is the amount of https://docs.solana.com/terminology#lamport that is stored in the account. It is a mutable reference to an unsigned 64-bit integer. |
-| data: &’a mut [u8] | The data field represents the data held in the account that is modifiable by programs. It is stored as a mutable reference to a byte array. |
-| owner: &’a Pubkey | The owner field is the public key of the program which governs the state transitions of the account. |
-| executable: bool | The executable field indicates whether this account is a program account (true) or a data account (false). |
-| rent_epoch: u64 | The rent_epoch field specifies the epoch at which the account will next owe rent. Every account must pay https://docs.solana.com/terminology#rent in order to store its data on the Solana blockchain (more on this later). |
+| Field | Type | Description |
+| --- | --- | --- |
+| key | &’a Pubkey | The key field contains the address to the Solana account. The address is essentially the account’s https://docs.solana.com/terminology#public-key-pubkey. It is in the form of a base58 encoded string. |
+| is_signer | bool | The is_signer field indicates whether this account has the authority to sign for a given transaction. |
+| is_writable | bool | The is_writable field indicates whether this account is able to be modified in a given transaction. |
+| lamports | &’a mut u64 | The lamports field is the amount of https://docs.solana.com/terminology#lamport that is stored in the account. It is a mutable reference to an unsigned 64-bit integer. |
+| data | &’a mut [u8] | The data field represents the data held in the account that is modifiable by programs. It is stored as a mutable reference to a byte array. |
+| owner | &’a Pubkey | The owner field is the public key of the program which governs the state transitions of the account. |
+| executable | bool | The executable field indicates whether this account is a program account (true) or a data account (false). |
+| rent_epoch | u64 | The rent_epoch field specifies the epoch at which the account will next owe rent. Every account must pay https://docs.solana.com/terminology#rent in order to store its data on the Solana blockchain (more on this later). |
 
 ## Reading Solana Blockchain State
 
@@ -145,11 +145,11 @@ In the above example, we assembled an instruction and a transaction for a native
 
 Instructions are objects which contain three fields (TS syntax):
 
-| Fields | Description |
-| --- | --- |
-| keys: Array | The keys field is an array of public keys of the accounts that will be read from or altered in the process of this instruction. |
-| programId: PublicKey | The programId field is the address of the program we are invoking with this instruction. |
-| data?: Buffer | The data field is a byte array of any data that we should pass to the given program. The ? indicates that this field may potentially be empty.  |
+| Fields | Type | Description |
+| --- | --- | --- |
+| keys | Array | The keys field is an array of public keys of the accounts that will be read from or altered in the process of this instruction. |
+| programId | PublicKey | The programId field is the address of the program we are invoking with this instruction. |
+| data? | Buffer | The data field is a byte array of any data that we should pass to the given program. The ? indicates that this field may potentially be empty.  |
 
 Here is an example of what this would look like in TypeScript:
 

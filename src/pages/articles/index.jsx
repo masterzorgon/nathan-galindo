@@ -13,9 +13,9 @@ function Article({ article }) {
           <Card.Title href={`/articles/${article.slug}`}>
             {article.title}
           </Card.Title>
-          <p className='z-10 text-sm text-teal-500 bg-zinc-800 rounded-full px-3'>
+          {/* <p className='z-10 text-sm text-teal-500 bg-zinc-800 rounded-full px-3'>
             #{article.tag}
-          </p>
+          </p> */}
         </div>
         <Card.Eyebrow
           as="time"

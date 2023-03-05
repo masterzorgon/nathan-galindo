@@ -126,7 +126,7 @@ function Article({ article }) {
         <Card.Title href={`/articles/${article.slug}`}>
           {article.title}
         </Card.Title>
-        <p className='z-10 mb-1 text-sm text-teal-500 bg-zinc-800 rounded-full pl-3 pr-3'>
+        <p className='border-2 border-transparent z-10 text-sm text-teal-500 dark:bg-zinc-800 bg-zinc-50 rounded-full px-3'>
           #{article.tag}
         </p>
       </div>

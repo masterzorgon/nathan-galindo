@@ -15,6 +15,7 @@ function SocialLink({ className, href, children, icon: Icon }) {
   return (
     <li className={clsx(className, 'flex')}>
       <Link
+        target="_blank"
         href={href}
         className="group flex text-sm font-medium text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"
       >
@@ -78,19 +79,18 @@ export default function About() {
           </div>
           <div className="lg:pl-20">
             <ul role="list">
-              <SocialLink target="_blank" href="https://twitter.com/_zebedee_" icon={TwitterIcon}>
+              <SocialLink href="https://twitter.com/_zebedee_" icon={TwitterIcon}>
                 Follow on Twitter
               </SocialLink>
-              <SocialLink target="_blank" href="https://github.com/nathanzebedee" icon={GitHubIcon} className="mt-4">
+              <SocialLink href="https://github.com/nathanzebedee" icon={GitHubIcon} className="mt-4">
                 Follow on GitHub
               </SocialLink>
-              <SocialLink target="_blank" href="https://www.linkedin.com/in/nathan-galindo/" icon={LinkedInIcon} className="mt-4">
+              <SocialLink href="https://www.linkedin.com/in/nathan-galindo/" icon={LinkedInIcon} className="mt-4">
                 Follow on LinkedIn
               </SocialLink>
               <SocialLink
                 href="mailto:nathan_galindo1@baylor.edu"
                 icon={MailIcon}
-                target="_blank"
                 className="mt-8 border-t border-zinc-100 pt-8 dark:border-zinc-700/40"
               >
                 nathan_galindo1@baylor.edu

@@ -219,7 +219,7 @@ const Frameworks = () => {
             </div>
             <dl className="flex flex-auto flex-wrap gap-x-2">
               <dt className="sr-only">Tool</dt>
-              <a target="_blank" href={tool.url} className="transition-all duration-150 mt-3 w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100 dark:hover:text-teal-500">
+              <a target="_blank" href={tool.url} className="transition-all duration-150 mt-3 w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100 dark:hover:text-teal-500 hover:text-teal-500">
                 {tool.name}
               </a>
             </dl>
@@ -273,7 +273,7 @@ const Languages = () => {
             </div>
             <dl className="flex flex-auto flex-wrap gap-x-2">
               <dt className="sr-only">Language</dt>
-              <a target="_blank" href={lang.url} className="transition-all duration-150 mt-3 w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100 dark:hover:text-teal-500">
+              <a target="_blank" href={lang.url} className="transition-all duration-150 mt-3 w-full flex-none text-sm font-medium text-zinc-900 dark:text-zinc-100 dark:hover:text-teal-500 hover:text-teal-500">
                 {lang.name}
               </a>
             </dl>

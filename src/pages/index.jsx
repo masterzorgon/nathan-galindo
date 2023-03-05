@@ -392,7 +392,7 @@ export default function Home({ articles }) {
     <>
       <Head>
         <title>
-          Nathan Galindo - Web2/Web3 Developer, researcher, and guitarist
+          Nathan Galindo - Software developer, researcher, and guitarist.
         </title>
         <meta
           name="description"

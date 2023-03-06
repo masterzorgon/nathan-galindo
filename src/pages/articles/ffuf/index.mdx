@@ -58,7 +58,7 @@ Example:
 Above, we are limiting our request rate to 100 requests per second.
 
 ## Filters and Matchers
-Because not all websites will return appropriate [[HTTP responses (200 OK, 404 error, etc.), we can **include filters and matchers to sift out the nonsense** results from our scans.
+Because not all websites will return appropriate HTTP responses (200 OK, 404 error, etc.), we can **include filters and matchers to sift out the nonsense** results from our scans.
 
 **Filters**
 * Removes requests/responses which *match* the filter.
@@ -94,10 +94,10 @@ We can **fuzz POST data** by including the `FUZZ` keyword into our POST request.
 
 Example:
 > `ffuf -w [wordlist path] -X POST -d "username=admin&password=FUZZ" -u [target ip]`
-* `-X`: Signifies which [[HTTP method to use.
-* `-d`: Signifies the [[HTTP request we are manipulating. 
+* `-X`: Signifies which HTTP method to use.
+* `-d`: Signifies the HTTP request we are manipulating. 
 
-Above, we are [[brute forcing a login POST request by including `FUZZ` as the value to the `password` parameter.
+Above, we are brute forcing a login POST request by including `FUZZ` as the value to the `password` parameter.
 
 We can also **fuzz JSON POST data** by including the `FUZZ` keyword into our JSON POST request.
 
@@ -108,15 +108,15 @@ Example:
 This feature allows us to pentest API endpoints.
 
 ## FFUF Vs. Burp Scanner
-FFUF is a [[brute forcing and [[fuzzing tool. It allows us to brute force for hidden directories and general content discovery.
+FFUF is a brute forcing and fuzzing tool. It allows us to brute force for hidden directories and general content discovery.
 
 Example: 
 > `ffuf -w [wordlist path] -u [target ip]/FUZZ/ -o [output file] relay-proxy http://127.0.0.1:8080`
 
-* `-w`: Signifies the path to our [[fuzzing wordlist.
-* `-u`: Signifies the [[URL or IP we are targeting.
-* `/FUZZ/`: By inserting `FUZZ` into our target IP or [[URL path, we are telling FFUF where to insert the wordlists entries.
-* `relay-proxy`: Allows us to replay the working [[HTTP requests and relay them to Burp.
+* `-w`: Signifies the path to our fuzzing wordlist.
+* `-u`: Signifies the URL or IP we are targeting.
+* `/FUZZ/`: By inserting `FUZZ` into our target IP or URL path, we are telling FFUF where to insert the wordlists entries.
+* `relay-proxy`: Allows us to replay the working HTTP requests and relay them to Burp.
 
 What makes this so cool is that, when sending the vulnerable endpoints to Burp, we are then able to manipulate them using Burp's toolkit. This essentially mimics the functionality of Burpsuite Professional's Scanner.
 

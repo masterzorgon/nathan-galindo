@@ -7,7 +7,7 @@ export const meta = {
   title: 'Hash Functions',
   tag: "blockchain",
   description:
-    'According to Silvio Micali in an interview with Lex Fridman, the hash function is one of the most beautiful utilities in mathematics and computer science (paraphrasing). This article is a brief conceptual introduction to hash cryptography and its applications in blockchain',
+    'According to Silvio Micali in an interview with Lex Fridman, the hash function is one of the most beautiful utilities in mathematics and computer science (paraphrasing). This article is a brief conceptual introduction to hash cryptography and its applications in blockchain.',
 }
 
 export default (props) => <ArticleLayout meta={meta} {...props} />
@@ -49,6 +49,21 @@ In order to organize blocks of data in a chain sequence, each block must have 3 
 When you start a new blockchain, you at first have the **genesis block**, which has the position of `0`. When you want to chain the next block into position `1`, you must include the hash value of block `0` with block `1`. This way, block `1` points directly to the block preceding it. When you repeat this pattern for every subsequent block, you end up with a chain of blocks each with pointers to the block that came immediately before.
 
 Remember how I mentioned that any minute change to the input value of a hash function would drastically change the hash function's output? That means if anyone were to ever manipulate the data of any block, their edits to the data would alter the block's hash value. Since each blocked is linked to the preceding block by their hash output, this altering of the block's hash would break the blockchain, exposing that there was an altering of the data. 
+
+## In summary
+
+In blockchain technology, hash functions are used to create a digital fingerprint, or hash, of each block of data in the chain. Each block contains a list of transactions, and the hash function is applied to this list to produce a unique hash. The hash of each block also includes the hash of the previous block, which creates a chain of linked blocks.
+
+By linking each block to the previous one using its hash, the blockchain creates an immutable, tamper-proof ledger of transactions. Any attempt to alter the data in one block will change its hash, which in turn will change the hash of the subsequent block. This creates a cascade effect that makes it virtually impossible to tamper with the data without being detected.
+
+Hash functions also provide an efficient way to verify the integrity of the data stored on the blockchain. By comparing the hash of a block to the hash stored on the previous block, network nodes can quickly determine if any data has been changed or corrupted.
+
+Overall, hash functions are a critical component of blockchain technology that enables secure, transparent, and tamper-proof transactions to be recorded and verified on a distributed ledger.
+
+
+
+
+
 
 ---
 ## References

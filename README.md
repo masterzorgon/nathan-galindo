@@ -1,5 +1,5 @@
 # Nathan Galindo's Website
-This is a website by Nathan Galindo. It contains a collection of my long-form thoughts, projects, and technical skills.
+This is a website by Nathan Galindo. It contains a collection of my long-form thoughts, projects, and technical skills. You can view the hosted website [here](https://nathan-galindo.vercel.app/).
 
 <img width="995" alt="Screen Shot 2023-03-06 at 11 57 00 PM" src="https://user-images.githubusercontent.com/85138723/223333223-428f94d7-dc13-4948-8088-5ca1d25897f4.png">
 

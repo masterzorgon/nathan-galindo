@@ -20,12 +20,19 @@ const projects = [
     logo: "",
   },
   {
-    name: "Solana Frontend Development",
+    name: "Solana Frontend Development Guide",
     description:
       "This repository is a web application which guides you through a series of frontend development projects for interfacing with the Solana blockchain. I developed this app to teach The Blockchain Collaborative members about blockchain development.",
     link: { href: "https://github.com/nathanzebedee/solana-frontend-development", label: "github.com" },
     logo: ""
-  }
+  },
+  {
+    name: "Solana Backend Development Bootcamp",
+    description:
+      "This Notion page details a six week bootcamp designed to teach students how to develop Solana smart contracts. By the end of this course, the student should have a solid conceptual of what blockchain is, why it matters, and how to develop intermediate Solana smart contracts.",
+    link: { href: "https://marble-target-926.notion.site/Solana-Development-Bootcamp-7d59ddd5cc1849aab4b543f378087665", label: "notion.io" },
+    logo: ""
+  },
 ]
 
 function LinkIcon(props) {

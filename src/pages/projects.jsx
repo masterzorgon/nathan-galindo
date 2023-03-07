@@ -16,7 +16,7 @@ const projects = [
     name: 'NFT Analysis and Design Paradigms Applied to Invoicing',
     description:
       "This repository contains the code for my thesis. It is a proof of concept that uses NFTs to create a more efficient e-invoicing system. This particular implementation uses Solana concurrent Merkle tree technology to create a decentralized invoicing system that could potentially scale to enterprise-level use.",
-    link: { href: 'https://github.com/nathanzebedee/blockchain-research', label: 'github.com' },
+    link: { href: 'https://marble-target-926.notion.site/NFT-Analysis-and-Design-Paradigms-Applied-to-U-S-Invoicing-238ffe88d35540bc9081dfb59660b48b', label: 'notion.io' },
     logo: "",
   },
   {

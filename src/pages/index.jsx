@@ -403,10 +403,9 @@ function Photos() {
         {[image1, image2, image3, image5, image4].map((image, imageIndex) => (
           <div
             key={image.src}
-            className={clsx(
-              'inset-0 hover:-inset-2 transition-all duration-300 relative aspect-[9/10] w-44 flex-none overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 sm:w-72 sm:rounded-2xl',
-              rotations[imageIndex % rotations.length]
-            )}
+            className={
+              `hover:rotate-0 ${rotations[imageIndex % rotations.length]} inset-0 hover:-inset-2 transition-all duration-300 relative aspect-[9/10] w-44 flex-none overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 sm:w-72 sm:rounded-2xl`
+            }
           >
             <Image
               src={image}

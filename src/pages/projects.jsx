@@ -33,7 +33,15 @@ const projects = [
     link: { href: "https://marble-target-926.notion.site/Solana-Development-Bootcamp-7d59ddd5cc1849aab4b543f378087665", label: "notion.io" },
     logo: ""
   },
+  {
+    name: "Baylor Bridges",
+    description:
+      "Baylor Bridges is a professional networking platform designed to help Baylor University students make meaningful connections with Baylor alumni working in the medical industry..",
+    link: { href: "https://youtu.be/SwaDLrJovjk", label: "youtube.com" },
+    logo: ""
+  },
 ]
+https://youtu.be/SwaDLrJovjk
 
 function LinkIcon(props) {
   return (

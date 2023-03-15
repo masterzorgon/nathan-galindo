@@ -41,7 +41,6 @@ const projects = [
     logo: ""
   },
 ]
-https://youtu.be/SwaDLrJovjk
 
 function LinkIcon(props) {
   return (

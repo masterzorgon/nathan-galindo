@@ -36,8 +36,15 @@ const projects = [
   {
     name: "Baylor Bridges",
     description:
-      "Baylor Bridges is a professional networking platform designed to help Baylor University students make meaningful connections with Baylor alumni working in the medical industry..",
+      "Baylor Bridges is a professional networking platform designed to help Baylor University students make meaningful connections with Baylor alumni working in the medical industry.",
     link: { href: "https://youtu.be/SwaDLrJovjk", label: "youtube.com" },
+    logo: ""
+  },
+  {
+    name: "The Blockchain Collaborative",
+    description:
+      "The Blockchain Collaborative is a student organization at Baylor University dedicated to raising the next generation of innovators in the blockchain industry.",
+    link: { href: "https://www.tbcollaborative.rocks/", label: "tbcollaborative.rocks" },
     logo: ""
   },
 ]

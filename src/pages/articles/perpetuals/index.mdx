@@ -1,0 +1,91 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2023-03-31',
+  title: 'Perpetuals',
+  tag: "blockchain",
+  description:
+    'Perpetual Futures are derivative financial instruments which allow investors access to the synthetic returns of an asset (typically cryptocurrencies) that offers high yields without requiring the trader to forfeit their position.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+Perpetual Futures are derivative financial instruments which allow investors access to the synthetic returns of an asset (typically cryptocurrencies) that offers high yields without requiring the trader to forfeit their position.
+
+> ℹ️ **Legal disclaimer:** Since perpetual futures trading is unregulated or not authorized by the CFTC, exchanges offering [crypto futures contracts](https://cointelegraph.com/trading-for-beginners/a-beginners-guide-to-cryptocurrency-trading-strategies) are not accessible in the United States. Additionally, one must conduct proper due diligence before getting involved in risky financial instruments like perpetual contracts. None of the content expressed in this article should be considered financial or investment advice.
+
+## Perpetual Futures
+
+**What is a futures contract?**
+
+A futures contract is a derivative financial instrument (which means that they derive their value from an underlying asset) that allows two parties to bet on whether a given asset’s price will go up or down in the future.  In this scenario, Trader A makes a financial agreement with Trader B (via a futures contract) to sell them one ETH for $15,000 on January 5th, 2024 (which is called the settlement date, which is defined when the futures contract is created and cannot be changed). If the price of ETH is worth less than $15,000 upon the settlement date, then Trader A “wins” since they sold their asset for more than its market value; however, if the price of ETH is worth more than $15,000, then Trader B “wins” since they just acquired an asset at a discount. It is important to note that the speculated asset (in this case: ETH) is hardly ever exchanged on the settlement date, but rather the asset’s equivalent cash value — a procedure called a cash settlement.
+
+**So what makes a futures contract “perpetual”?**
+
+When a futures contract does not have a specified settlement date, we refer to it as a perpetual futures contract. Perpetual futures are typically offered on cryptocurrency exchanges so as to allow investors speculative access to the price movements of digital assets (what makes this special is that typically, through centralized financial avenues, a trader must be an accredited investor if they wanted to trade derivatives). In order to open a position with a perpetual futures contract, the trader must first deposit a margin requirement — an amount of collateral that is used to cover any potential losses that may occur in the early stages of a trade.
+
+Since perpetual futures contracts lack a settlement date, traders are allowed to hold a position for an indefinite amount of time; however, in the event of a margin call, the trader may be required to deposit additional funds to their account to meet the margin requirement. If the trader fails to meet the margin call, their position is usually liquidated so as to prevent them from defaulting and causing rippling financial losses to other traders.
+
+A margin call occurs when the notional value of the trader’s position falls below the maintenance margin, which is a percentage of the notional value of the position that is set every time the contract is traded (and is typically lower than the margin requirement). The maintenance margin is used to ensure that the traders have sufficient funds in their accounts to cover any potential ongoing losses if the market were to move against their position.
+
+**In summary:**
+
+- Futures contracts are bets between two parties on the price of an asset projected into the future.
+- Futures contracts are derivatives.
+- Futures contracts are settled on a settlement date.
+- Perpetual futures contracts have no settlement date.
+    - If the position’s value falls below the maintenance margin, a margin call occurs.
+    - In the event of a margin call, the trader must maintain the margin requirement (by depositing more funds).
+    - If the trader fails to meet the margin call, their position is liquidated.
+
+---
+
+## Applications of Perpetuals
+
+**How does dYdx use perpetual futures?**
+
+dYdX is a decentralized digital assets exchange that operates via Ethereum smart contracts. Their unique offering is that they support perpetual futures trading with no intermediaries. In this, investors can gain exposure to the returns of various digital assets natively on the Ethereum blockchain, while being able to supply and ERC-20 token as collateral.
+
+Because perpetual futures can be sustained indefinitely, dYdX uses a funding rate to ensure that the perpetual future contract’s price stays tethered to the price of the underlying asset. This funding rate is calculated algorithmically based on the Index Price and sampled Mid-Market Prices for the perpetual. Essentially, when the funding rate is positive (relative to the index), long traders make payments to short traders; and when the funding rate is negative, the roles are reversed. These payments are P2P transactions which are not handled by the exchange, and are proportional to the size of the trader’s market position. On dYdX, these funding payments are made in USDC, and are dispersed hourly. That being said, traders who deal with perpetual futures contracts on dYdX are trading the contracts themselves (for their associated, hourly payouts), not dollars or cryptocurrencies.
+
+To calculate the hourly payment, you can use the following formula: 
+
+> `F = (-1) * S * P * R`
+> 
+- `S` is the size of the position (positive if long, negative if short)
+- `P` is the oracle (index) price for the market
+- `R` is the funding rate (as a 1-hour rate)
+
+---
+
+**How does Parcl use perpetual futures?**
+
+Parcl is a big data and AI/ML company that uses hyperlocal location data and insights to create an exchange where investors can indirectly invest (long or short) on global real estate portfolios. In Parcl’s words, their company “acts as a perpetual prediction market that clears at available resources; think of it as perpetual futures on an AMM.” 
+
+Essentially, Parcl is applying perpetuals to real-time real estate prices to the effect of allowing a global investor base access to the (synthetic) returns of coveted assets that cannot otherwise support liquid trading markets. 
+
+Unlike the funding rates seen on other perpetuals trading platforms (such as the aforementioned dYdX exchange), Parcl’s perpetuals funding rates continuously move in the direction of the majority market sentiment between long and short traders. In english: the larger the majority of long/short traders in a market, the faster the funding rate will move for a given isolated pool (or market, where traders can get exposure to a price feed and LPs can provide liquidity). 
+
+In this scenario, the traders who exist in the minority receive funding payments for as long as their position remains in the minority (49.9999999% of the market). This way, traders have an opportunity to exclusively trade funding rates on Parcl—so long as they can avoid price risk associated to a given market.
+
+---
+
+**In summary:**
+
+- dYdX is a decentralized exchange that runs on Ethereum and supports perpetuals.
+- In order to tether the perpetual’s price to the underlying asset’s price, dYdX enforces a funding rate.
+    - If the funding rate is positive, long holders pay short holders.
+    - If the funding rate is negative, short holders pay long holders.
+- Parcl is a real estate portfolio company built on top of Solana.
+- Parcl uses perpetuals to give traders synthetic access to real estate movements (long or short).
+    - Each market (isolated pool) on Parcl has its own funding rate.
+    - The movement of funding rates depends on the severity of skewness in the market between long and short traders.
+
+---
+
+## Resources
+
+- ****[Trading the Funding Rate on Parcl](https://www.parcl.co/blog/trading-the-funding-rate-on-parcl)****
+- **[Parcl White paper](https://www.notion.so/Parcl-v2-6f27eaed8a5e46e29762a9de128ba0f9)**
+- ****[What are perpetual futures contracts in cryptocurrency?](https://cointelegraph.com/explained/what-are-perpetual-futures-contracts-in-cryptocurrency#:~:text=Perpetual%20futures%20trading%20allows%20traders,case%20of%20such%20financial%20instruments)****

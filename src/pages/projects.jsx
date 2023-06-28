@@ -6,6 +6,13 @@ import { SimpleLayout } from '@/components/SimpleLayout'
 
 const projects = [
   {
+    name: 'Vlyss',
+    description:
+      "Vlyss is a fintech startup I founded that uses blockchain technology to enhance the speed and security of international payments.",
+    link: { href: 'https://vlyss.com', label: 'vlyss.com' },
+    logo: "",
+  },
+  {
     name: 'Futura Energy',
     description:
       "This white paper was drafted for Schneider Electric's 2022 Go Green international pitch competition. In this paper, Karis Anoruo and I ideate a micro grid energy system which leverages blockchain technology to create a more economically democratic energy system in Lagos, Nigeria, and other developing economies.",

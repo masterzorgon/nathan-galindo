@@ -1,0 +1,102 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2023-06-05',
+  title: 'Solana Security: Signer Authorization',
+  tag: "cybersecurity",
+  description:
+    'This article explains what signer authorization is and the importance of checking signer authorization when developing Solana smart contracts.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## Vulnerability: Signer Authorization Failure
+
+Any interaction with a smart contract that alters the state of the blockchain is classified as a *transaction*, and every transaction must be signed by an initiating entity (i.e., a user, other smart contract, etc.). That being said, it is important to implement signer checks in the instructions we define on our smart contracts — this way, we can prevent unauthorized accounts from executing instructions they shouldn’t be able to perform.
+
+## Explained Simply
+
+Alright, let's imagine that you're going to a fancy, exclusive club. But this club is very special - it's a club where the members can make rules about how things work inside. These rules are like smart contracts on Solana. They tell everyone what can and cannot be done inside the club.
+
+Now, the club has a very tough bouncer at the door. His job is to make sure that only members of the club can come in and only they can make the rules. This bouncer is like the "signer check" in a Solana smart contract.
+
+When a member of the club (which is like an account on Solana) comes to the door, the bouncer checks their club membership card (which is like their digital signature). The bouncer knows all the members and their unique membership cards, so he can quickly tell if the person is really a member or if they're pretending.
+
+If the membership card checks out, the member can come in and make or change rules. If not, they're not allowed in. This is what a "signer check" does in Solana smart contracts - it makes sure that only the accounts that are supposed to be able to use the smart contract can do so.
+
+In Solana, accounts that want to interact with a smart contract need to sign a transaction, which is like showing their membership card to the bouncer. The smart contract checks the signature to make sure it's from a valid account before it lets the transaction go through.
+
+This is really important because it keeps the club (or the smart contract) safe and fair for everyone. Without the bouncer (or the signer check), anyone could pretend to be a member and change the rules in ways that might not be fair or safe.
+
+## Implications
+
+Not including a signer check in your smart contract instructions can have significant implications, and it's generally not a good idea for the security and integrity of your contract. Here's why:
+
+1. **Unauthorized Access**: Without a signer check, anyone could execute actions in your smart contract, even if they're not supposed to. For example, someone could try to transfer funds out of an account, change ownership of a digital asset, or manipulate data stored in the smart contract.
+2. **Loss of Assets**: If your smart contract manages valuable digital assets (like cryptocurrency or tokenized assets), unauthorized access can lead to theft and loss of those assets.
+3. **Loss of Trust**: If users or other smart contracts interact with your contract, they need to trust that it works correctly and securely. If your contract is vulnerable to unauthorized access, it could lose the trust of users and other contracts, which could have serious consequences for its usefulness and value.
+
+In summary, not including a signer check in your smart contract instructions can open the door to unauthorized access, which can lead to loss of assets, trust, and potential legal consequences. It's essential to include signer checks to ensure the security and proper functioning of your smart contract.
+
+## Solutions
+
+> All examples provided are implemented using Rust and the Anchor framework for Solana smart contract development.
+> 
+
+### Using long-form Rust:
+
+```rust
+if !ctx.accounts.authority.is_signer {
+	return Err(
+		ProgramError::MissingRequiredSignature.into()
+	);
+}
+
+...
+
+// account validation struct
+#[derive(Accounts)]
+pub struct UpdateAuthority<'info> {
+	#[account(mut, has_one = authority)]
+	pub vault: Account<'info, Valut>,
+	pub new_authority: AccountInfo<'info,>,
+	pub authority: AccountInfo<'info>
+}
+```
+
+In the example above, we manually check if the `authority` account being passed in through out account validation struct is the signer. We do this to see if the `authority` account has the `is_signer` property. By adding this check, the instruction would only process of the account passed in as the `authority` singed the transaction. 
+
+The drawback of this signer check method is that it muddles the separation between account validation and instruction logic. It is also worth noting that the `AccountInfo` account type indicates that no checks are performed on the account prior to instruction execution. `AccountInfo` should typically be avoided at all costs.
+
+### **Using the `Signer` account type**:
+
+```rust
+// account validation struct
+#[derive(Accounts)]
+pub struct UpdateAuthority<'info> {
+	#[account(mut, has_one = authority)]
+	pub vault: Account<'info, Valut>,
+	pub new_authority: AccountInfo<'info,>,
+	pub authority: Signer<'info>
+}
+```
+
+The `Signer` account type (provided by the Anchor framework) is applied to any account(s) in your account validation struct that should be responsible for singing for a transaction. The `Signer` account type in the account validation struct checks at runtime that the specified account is a signer on the transaction. Using `Signer` also allows you to separate the signer check from the instruction logic, however, no other ownership checks are performed on the account (and thus, you are unable to access the account’s underlying data).
+
+### **Using the `#[account(signer)]` constraint**:
+
+```rust
+// account validation struct
+#[derive(Accounts)]
+pub struct UpdateAuthority<'info> {
+	#[account(mut, has_one = authority)]
+	pub vault: Account<'info, Valut>,
+	pub new_authority: AccountInfo<'info,>,
+	#[account(signer)]
+	pub authority: Account<'info, AuthState>
+}
+```
+
+The `#[account(signer)]` constraint checks if an account passed into your account validation struct is a signer of the transaction. The `#[account(signer)]` constraint works similarly to the `Signer` account type, except that it allows you to implement that standard `Account` type for the signer account in your account validation struct, thus allowing you to access the signer account’s underlying data in your instruction. In essence, use the `#[account(signer)]` constraint when you want to access the signer account’s data, as well as check that they signed the transaction.

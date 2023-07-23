@@ -1,0 +1,104 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2023-06-05',
+  title: 'Solana Security: Owner Checks',
+  tag: "cybersecurity",
+  description:
+    'Understanding the importance and nuances of owner checks is essential for learning how to create secure Solana smart contracts.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## Vulnerability: Owner Check Failure
+
+Program Derived Accounts (PDAs) are data stores that are initialized and owned by a program on the Solana blockchain. Compared to standard accounts on Solana, PDAs do not have private keys, and therefore cannot be controlled by typical users — they should only be controlled by the program which owns the PDA account. Likewise, traditional accounts should only be controlled by their specified owner, whether that be a user or a program. For this reason, it is important that we implement owner checks in our program instructions; this way, we can make sure that the program executing instructions on an account is in fact the owner of the account.
+
+## Explained Simply
+
+Alright! Let's imagine you have a special toy chest, and the rule of your playroom is that only you, the owner of the chest, can put toys inside it. Each toy chest in the room has an owner tag that tells everyone who owns the chest.
+
+Now, what happens if someone else tries to put their toys into your chest? It's against the playroom rules, right? To prevent this from happening, we have a guard (like a friendly robot) that checks the owner tag on each toy chest before a toy is put into it.
+
+If the robot guard sees a toy chest that's about to receive a toy, it looks at the owner tag. If the tag says it's your chest, and you are the one trying to put the toy in, all is good. But if the tag says it's your chest and someone else tries to put their toy in, the guard robot will say, "Stop! This isn't your chest!" and prevents the toy from being put inside. This process of checking the owner tag is what we call an "owner check."
+
+But how does this relate to computer stuff like Solana smart contracts? In Solana, each account is like a toy chest and each instruction (a command or action) is like a toy. The rule is, only programs (which are like the owners in our toy chest example) that own an account should be able to execute instructions that modify that account.
+
+So, when a program wants to run an instruction, Solana checks to make sure that the program is indeed the owner of the account it's trying to work with, just like the guard robot checks the owner tags on the toy chests. This is important because it makes sure that only the right programs can modify the right accounts, which keeps everything secure and operating as it should.
+
+## Implications
+
+Failing to check the ownership of an account in a blockchain context such as Solana can lead to a number of serious issues, including security vulnerabilities and unexpected behavior in smart contracts. Here are a few implications:
+
+1. **Unauthorized Access:** If you do not verify that an account is owned by the expected program, other programs could potentially access or manipulate the data or funds stored in that account. This is similar to someone else being able to put toys in your toy chest or even take toys out.
+2. **Spoofing Attacks:** An attacker could create a program that generates an account with the same structure as one of your accounts. If ownership is not verified, they could pass this fake account to your program, tricking it into thinking it is a legitimate account. This is akin to someone else labeling their toy chest with your name and tricking the robot guard.
+3. **Loss of Funds or Data:** If an attacker is able to manipulate an account due to lack of ownership checks, they could potentially steal funds or modify data. This could disrupt your program's operation and possibly result in loss of user trust or legal consequences.
+4. **Breaking Program Logic:** Without owner checks, the execution of your smart contract might not go as planned, since other programs might change your account data in unexpected ways. This could lead to logical errors and incorrect execution, making your program unreliable.
+
+These implications highlight the importance of always performing owner checks when working with accounts in Solana or any other blockchain environment. It is a fundamental part of maintaining the integrity and security of your program.
+
+## Solutions
+
+> All examples provided are implemented using Rust and the Anchor framework for Solana smart contract development.
+> 
+
+### Using long-form Rust:
+
+```rust
+if ctx.accounts.pda.owner != ctx.program_id {
+	return Err(
+		ProgramError::IncorrectProgramId.into()
+	);
+}
+```
+
+Above, we manually check is see if the owner of an account passed into our account validation struct matches the `program_id` of the executing program. In this scenario, if the account’s owner attribute matches the `program_id` of the program executing the instruction, then the instruction will proceed; otherwise, it will fail. In this, we are verifying that the account is owned by the executing program, thus preventing accounts owned by an unexpected program to be passed into our instruction. 
+
+Otherwise, a malicious program could potentially create an identical account with an identical name and pass that account into our program. If our program fails to check whether it’s the owner of the passed in account, then the account will successfully deserialize (even though Anchor initializes new accounts with an eight-byte discriminator — this is because the discriminator is simply a hash of the account type name).
+
+### Using the `Account<'info, T>` wrapper and `Account` type:
+
+```rust
+// account validation struct
+#[derive(Accounts)]
+pub struct Checked<'info> {
+	#[account(has_one = admin)]
+	admin_config: Account<'info, AdminConfig>,
+	admin: Signer<'info>
+}
+
+// data account
+#[account]
+pub struct AdminConfig {
+	admin: Pubkey
+}
+```
+
+By implementing the `#[account]` attribute, Anchor program account types implement the `Owner` trait which allows the `Account<'info, T>` wrapper to automatically verify program ownership whenever an account is passed through the account validation struct. Compared to the `AccountInfo` account type, the `Account<'info, T>` wrapper makes life easier in the way it verifies program ownership and deserializes the underlying account data into the specified account type `T`. 
+
+By using the `Account<'info, T>` wrapper, we can implement ownership checks without cluttering our instruction logic. Additionally, the `has_one` constraint is used to check that the `admin` account passed into the account validation struct matches the `admin` field on the `admin_config` account.
+
+### Using the `#[account(owner = <expr>)]` constraint:
+
+```rust
+// account validation struct
+#[derive(Accounts)]
+pub struct Checked<'info> {
+	#[account(has_one = admin)]
+	admin_config: Account<'info, AdminConfig>,
+	admin: Signer<'info>,
+	#[account(
+		seeds = [b"test-seed"],
+		bump,
+		owner = token_program.key()
+	)]
+	pda_derived_from_another_program: AccountInfo<'info>,
+	token_program: Program<'info, Token>
+}
+```
+
+The `#[account(owner = <expr>)]` owner constraint allows you to specify an account within your account validation struct as having an owner other than the program currently executing the instruction. This way, you can define the external program (`<expr>`) that should own an account if it’s different from the currently executing one. 
+
+To use the owner constraint, you must have access to the address of the external program that should have ownership of the PDA your program is interacting with. You could either pass in the external program as an account in your account validation struct (using `Program<’info, T>`), or simply hardcode the external program’s address somewhere in your program.

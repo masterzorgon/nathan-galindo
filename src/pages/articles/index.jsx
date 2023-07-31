@@ -50,12 +50,12 @@ export default function ArticlesIndex({ articles }) {
         <title>Articles - Nathan Galindo</title>
         <meta
           name="description"
-          content="All of my long-form thoughts on programming, leadership, product design, and more, collected in chronological order."
+          content="Any and all content on this website is produced for educational and inspirational purposes only. Nothing on this website should be considered financial advice. I do not sanction or encourage the deployment of applications that violate applicable laws or regulations."
         />
       </Head>
       <SimpleLayout
         title="Writing on software, university, blockchain, and other interests."
-        intro="All of my long-form thoughts on programming, leadership, student life, and more, collected in chronological order."
+        intro="Any and all content on this website is produced for educational and inspirational purposes only. Nothing on this website should be considered financial advice. I do not sanction or encourage the deployment of applications that violate applicable laws or regulations."
       >
         <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
           <div className="flex max-w-3xl flex-col space-y-16">

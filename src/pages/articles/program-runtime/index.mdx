@@ -1,0 +1,110 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+import coverPhoto from './cover.png'
+import aboutPhoto from './about.png'
+import aid01 from './01.png'
+import aid02 from './02.png'
+import aid03 from './03.png'
+import aid04 from './04.png'
+import aid05 from './05.png'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2023-11-10',
+  title: 'Solana Program Runtime For Dummies',
+  tag: "blockchain",
+  description:
+    'Learn about the Solana Virtual Machine, its runtime specification, and how its recently announced updates will improve your Solana developer experience.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+Learn about the Solana Virtual Machine, its runtime specification, and how its recently announced updates will improve your Solana developer experience.
+
+<Image src={coverPhoto} alt="" />
+
+> In my role as a Solana Ambassador, I've dedicated considerable time to working with university students, guiding them through both the high-level concepts and technical intricacies of Solana and its program development. 
+> However, I've noticed that newer or less experienced Solana developers may not have a strong interest in the low-level technologies that significantly influence their approach to Solana program development, including the Solana runtime. From what I’ve gathered, this is because many of the resources that discuss these low-level technologies are too technically ambitious or nuanced for new Solana developers to easily digest. 
+> This is a deficit in the Solana developer market worth addressing because bridging this gap is essential for fostering a more inclusive and accessible Solana developer community. Just as the titan Helius illuminated the world in Greek mythology, the Helius company endeavors to shed light on technical concepts and challenges, aiding Solana developers in reaching their utmost potential.
+> With this in mind, I've crafted this article to convey upcoming changes to the Solana runtime in a way that is easily understandable for developers who are relatively new to the Solana ecosystem. Enjoy!
+
+## What’s This Article About?
+
+<Image src={aboutPhoto} alt="" />
+
+The Solana runtime, Sealevel, is a parallel smart contracts execution engine that allows for thousands of programs to run concurrently using as many cores as are available to the validator, as long a they operate on different pieces of the blockchain’s state. Solana’a implementation of multi-threaded execution is one of the core innovations that distinguished Solana from other blockchain protocols, and paved the way for web-scale decentralized blockchains. <strong>Having a grounded understanding of Solana’s execution environment is important because its capabilities and limitations ultimately determine your approach to program development</strong>. 
+
+That being said, the current state of the Solana runtime demands the developer deal with certain complexities and constraints that impact their development workflows, such as: carefully managing the use of expensive operations like cross-program invocations (CPIs) or account reallocations in order to save memory bandwidth and ensure efficient program execution. These limitations have fundamentally determined the complexity and use cases you could explore with your Solana programs; you were forced to justify your frustrations by convincing yourself that “chewing glass” was core to the Solana ethos. This all changes with the Solana runtime updates announced recently at Breakpoint 2023.
+
+At Breakpoint 2023, the Solana Labs team announced updates to the Solana runtime, which they’ve dubbed the “Solana Runtime V2”. Why should you care? Because <strong>writing Solana programs is hard</strong>, even with frameworks like Anchor; <strong>however, the proposed updates will alleviate a lot of the most tedious an inhibiting factors of writing Solana programs</strong>, removing a significant degree of technical depth that is currently required of the developer. In this article, we will 1) demystify the Solana execution environment, 2) discuss the current state of the Solana runtime, and 3) learn how the runtime’s upcoming updates will improve your Solana developer experience. Let’s dive in!
+
+## How Are Programs Executed On Solana?
+
+The **Solana Virtual Machine** (**SVM**) is the execution environment that is **responsible for processing Solana programs and managing the state of the network** as its impacted by the operations of these programs. That being said, when transactions are submitted to the network and programs are invoked, the SVM serializes (or changes) the program code into a bytecode format that Solana validator’s can understand.
+
+> Bonus knowledge: The specific encoding of information that the SVM compiles smart contract code to is called Berkeley Packet Filter (BPF). BPF bytecode is used by the SVM because it allows validators to execute transactions speedily. Solana programs can be written in Rust, C++, or C because these are all languages which compile to BPF bytecode.
+
+<Image src={aid01} alt="" />
+
+In the Solana network, every node, also known as a "validator," operates using the SVM software. It's crucial to understand that each node runs its own separate version of the SVM. This setup enhances the Solana network's resilience to potential issues like DDoS attacks, shutdowns, or security risks caused by vulnerabilities in smart contracts when they're deployed to the network. 
+
+**When transactions are submitted to the Solana network, they are relayed to these nodes via the Solana runtime**, also known as Sealevel. Upon receiving these state changes from the runtime, the SVM instances begin the process of executing and validating the transactions, thus updating the blockchain’s state. View graphic 01 for a visual reference.
+
+<Image src={aid02} alt="" />
+
+Because Solana programs specify blockchain state will be read from or written to before execution, the Solana runtime is able to [“horizontally” scale](https://nitro-svm.gitbook.io/documentation/introduction/why-solana-vm/building-on-sealevel-vm) smart contract executions, allowing the SVM to handle thousands of transactions concurrently (whereas the Ethereum Virtual Machine can handle one at a time). View graphic 02 for a visual reference.
+
+## How Is the Runtime Changing?
+
+So the questions is: How is the Solana runtime being improved? And how will these changes affect me? The most meaningful updates and their impact on your developer experience are outlined below:
+
+### Faster and More Efficient
+
+<Image src={aid03} alt="" />
+
+| Improvement | Explanation for Dummies |
+| --- | --- |
+| No more limit on reallocation | Previously, there was a limit of 10 KiB per instruction for reallocation. Removing this limit means developers can now reallocate memory without restrictions, enhancing the program's capabilities. |
+| No more limit on CPI depth | The previous constraint of a CPI depth limit of 4 has been lifted, allowing developers to make more nested CPI calls, enabling more complex and layered program structures. |
+| No more fixed stack frames | Eliminating the fixed stack frames that used to consume the entire stack (4 KiB) ensures that developers have more space for executing their programs, leading to more efficient memory usage. |
+| Cheaper CPI and system program calls | The new runtime reduces the cost of CPI and system program calls, making it more affordable for developers to perform essential functions, ultimately reducing the overall expenses associated with program execution. |
+| Cheaper declaring possible programs | Developers will experience a more economical process when declaring possible programs in a transaction, lowering the costs associated with program development and execution. |
+| Cheaper base costs for executing programs | The new runtime introduces lower base costs for executing programs, making it more cost-effective for developers to run their programs on the Solana blockchain. |
+
+### API Improvements and Generic Interfaces
+
+<Image src={aid04} alt="" />
+
+| Improvement | Explanation for Dummies |
+| --- | --- |
+| Significant changes to public-facing APIs, addressing existing shortcomings. | The way developers interact with Solana programs is becoming more user-friendly. Solana is refining the language it uses for communication, making it simpler and more intuitive for developers. This ensures a smoother experience when creating and managing programs. |
+| Removal of entry point micros and introduction of generic interfaces. | Previously, developers had to deal with a cumbersome process called "entry point micros." Solana is doing away with this complexity and introducing something called "generic interfaces." This is like upgrading from a clunky key to a sleek touch screen – a more modern and efficient way to control and communicate with programs. |
+| Aiming for more extensible programs and improved composability. | Think of this as building with Lego blocks. Solana wants developers to be able to create programs that can easily connect and work together, much like how Lego pieces fit seamlessly. The goal is to make programs more flexible, adaptable, and capable of interacting in a variety of ways. |
+
+### Compatibility
+
+<Image src={aid05} alt="" />
+
+| Improvement | Explanation for Dummies |
+| --- | --- |
+| Program Runtime V2 will coexist with the existing runtime for the foreseeable future. | Imagine having both an old and a new version of your favorite game available. Similarly, Solana is keeping the current runtime (V1) around while introducing the new one (V2), allowing developers to choose and transition at their own pace. |
+| Introduction of new APIs while maintaining support for old ones. | Think of this like upgrading your smartphone's operating system – the new features are introduced, but the familiar functions you love remain unchanged. Solana is making improvements while ensuring that existing programs can continue to run smoothly. |
+| Interoperability between the two runtimes ensures a flexible transition period. | It's like having a bilingual friend who can communicate with both the old and the new. Solana V2 can interact with V1, making the transition seamless, while V1, lacking the necessary information, can't communicate with V2. | 
+| V2 will be backwards compatible, but v1 will get deprecated by gradually increasing the costs to run transactions on it. | This is like encouraging everyone to upgrade to the latest and greatest version. Solana V2 ensures that older programs will still function, but there's an incentive to transition as costs on V1 gradually rise. |
+
+## Conclusion
+
+If you made it to the end, congratulations! We shared an in-depth conversation about Solana’s runtime, its upcoming updates, and how these changes will impact your developer experience. Solana’s runtime was already a leading solution for fast program execution, but the recently announced improvements are a testament to Solana’s spirit for continual improvement and optimization.
+The Solana Runtime V2 represents a significant leap forward for the Solana developer ecosystem. Slowly but surely, we are moving away from the a tired acceptance of “chewing glass” and embracing Rust native workflows that focus on efficiency, enhanced composability, and an improved developer experience. In essence, the planned updates to the Solana runtime will empower developers to create programs with enhanced composability. **As time progresses, the heightened interactivity among Solana programs will foster a more vibrant ecosystem, unlocking novel use cases** that were previously beyond reach.
+
+Thanks to [@0xMert_](https://twitter.com/0xMert_) for activating me to write this article!
+
+## Additional resources
+
+| Resource | Description |
+| --- | --- |
+| [Sealevel — Parallel Processing Thousands of Smart Contracts](https://medium.com/solana-labs/sealevel-parallel-processing-thousands-of-smart-contracts-d814b378192) | Interested in learning more about Sealevel? Read on it from the man who is responsible for it. |
+| [What Is SVM — The Solana Virtual Machine](https://squads.so/blog/solana-svm-sealevel-virtual-machine) | Learn more about the Solana virtual machine. |
+| [Breakpoint 2023: Program Runtime V2](https://www.youtube.com/watch?v=Hc45gUtVj20) | Watch the Breakpoint 2023 announcement that discloses the updates to the Solana runtime. |
+| [Solana Runtime V2 Roadmap](https://github.com/solana-labs/solana/issues/28755) | View the progress of the Solana Runtime V2 on GitHub. |

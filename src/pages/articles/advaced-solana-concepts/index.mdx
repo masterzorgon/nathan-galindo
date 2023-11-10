@@ -1,0 +1,59 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2022-08-01',
+  title: 'Advanced Solana Development Concepts',
+  tag: "blockchain",
+  description:
+    'This article explores some more advanced concepts in Solana program development, such as: what oracles are and how to use them; how to handle big accounts; and, how to use clockwork threads.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## Clockwork threads
+
+[Clockwork threads](https://docs.clockwork.xyz/welcome/readme) are an automation primitive for developing Solana programs. Essentially,
+we can use Clockwork threads to execute a series of instructions on our programs on a schedule
+or in the event of some trigger.
+
+You can trigger the execution of your smart contract using the following "triggers":
+
+| **Trigger Condition** | **Description** | **Required Arguments** |
+|---|---|---|
+| Account | Starts execution when an account's data changes. | `address`: Account address to monitor. `offset`: Byte offset of account data to monitor. `size`: Size of byte slice to monitor (must be less than 1kb). |
+| Cron | Starts execution based on a cron schedule. | `schedule`: Schedule in cron syntax. `skippable`: Boolean indicating if invocation can be skipped during Solana network unavailability. |
+| Now | Starts execution immediately. | None |
+| Slot | Starts execution when a specified slot passes. | `slot`: The slot to begin execution on. |
+| Epoch | Starts execution when a specified epoch becomes active. | `epoch`: The epoch to begin execution on. |
+| Timestamp | Starts execution when a specified Unix timestamp has passed. | `unix_ts`: The Unix timestamp to begin execution on. |
+| Pyth | Starts execution when a price threshold is crossed. | `price_feed`: The Pyth price feed account to monitor. `equality`: Equality operator (≥ or ≤) to compare the price feed with the limit price. `limit`: Limit price that triggers execution. |
+
+Creating automated cron jobs for the execution of your Solana programs opens up a world of
+new use cases, such as:
+* Recurring payments: Executes an SPL token transfer on a user-defined schedule
+* Token distribution: Mints a new token and sends it to a target user every 60 seconds
+* Subscriptions: Allows users to pay on a recurrent schedule
+
+Below, I will walk you through what it looks like to create a Clockwork thread via cross program invocation (CPI) using the [Anchor framework](https://www.anchor-lang.com/):
+
+```rust
+  let bump = *ctx.bumps.get("thread_authority").unwrap();
+  clockwork_sdk::cpi::thread_create(
+      CpiContext::new_with_signer(
+          clockwork_program.to_account_info(),
+          clockwork_sdk::cpi::ThreadCreate {
+              payer: payer.to_account_info(),
+              system_program: system_program.to_account_info(),
+              thread: thread.to_account_info(),
+              authority: thread_authority.to_account_info(),
+          },
+          &[&[THREAD_AUTHORITY_SEED,payer.key().as_ref() , &[bump]]],
+      ),
+      LAMPORTS_PER_SOL / 10, // amount (0.1 sol)
+      thread_id,              // id
+      vec![target_ix.into()], // instructions
+      trigger,                // trigger
+  )?;
+```

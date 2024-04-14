@@ -1,0 +1,376 @@
+import { ArticleLayout } from '@/components/ArticleLayout'
+import Image from 'next/image'
+
+import coverPhoto from './cover.png'
+import aboutPhoto from './about.png'
+import aid01 from './01.png'
+import aid02 from './02.png'
+import aid03 from './03.png'
+import aid04 from './04.png'
+import aid05 from './05.png'
+
+export const meta = {
+  author: 'Nathan Galindo',
+  date: '2024-04-13',
+  title: 'Durable Nonces Explained',
+  tag: "blockchain",
+  description:
+    'The Solana runtime enforces a liveness window on all transactions, but what if your use case requires a larger timeframe to sign a transaction? Then you need to use durable nonces. Read this article to learn mroe.',
+}
+
+export default (props) => <ArticleLayout meta={meta} {...props} />
+
+## Introduction
+
+**Durable Nonces are a mechanism to guarantee the validity of an unexecuted transaction that persists outside the enforced liveness window** that the Solana runtime applies to all submitted transactions. By leveraging durable nonces, Solana developers can create experiences that are more responsive, reliable, and secure for users, particularly in scenarios where offline signing, batch processing, or multi-party approvals are required. 
+
+In order to completely understand the utility of Durable Nonces, we must first discuss the requirements for a valid Solana transaction and then apply these rules to more complex use cases.
+
+Prior to reading this article, it is recommended that you have a understanding of:
+
+1. **Solana Blockchain Basics**: A general understanding of how the Solana blockchain works, including concepts like [blocks, slots](https://www.helius.dev/blog/solana-slots-blocks-and-epochs), [transactions](https://solana.com/docs/core/transactions), and [the Solana runtime](https://nathan-galindo.vercel.app/articles/program-runtime).
+2. **JavaScript Basics**: Basic-level knowledge of how to use the JavaScript programming language, and more specifically the [@solana/web3.js library](https://solana-labs.github.io/solana-web3.js/), to send transactions to the Solana blockchain.
+3. **The Solana Command Line Interface**: Have [the Solana CLI](https://docs.solanalabs.com/cli/install) installed on your computer and have familiarity with [its commands](https://docs.solanalabs.com/cli/intro).
+
+By the end of this article, you will understand 1) The validity requirements of a Solana transaction and how Durable Nonces enforce these rules; 2) The purpose of Durable Nonces; and 3) How to implement Durable Nonces in a Solana transaction.
+
+## What Are The Requirements For A Valid Transaction?
+
+**The Solana runtime is designed to automatically reject transactions older than ~90 seconds, or 150 slots**. (A slot is a discrete unit of time approximately 400 milliseconds, during which a new block is added to the blockchain.) When your transaction fails to be included in a block within the specified timeframe, the runtime returns a “Blockhash expired” error. This error indicates that the blockhash included in your transaction’s `recent_blockhash` field is older than the 150 most recent slots. A blockhash is a 32-byte SHA-256 hash which identifies a given slot, and is used to indicate when a client last observed the ledger.
+
+**The enforced mortality and uniqueness of submitted transactions is a safeguard against replay attacks, or double-spend transactions**. A replay attack is when a valid transaction is maliciously replayed (resubmitted) multiple times, resulting in the same action being performed repeatedly (e.g., the transfer of funds). For example: If you send your friend 1 SOL, what is stopping your friend from resubmitting this transfer transaction to the network and draining your wallet? How does the runtime know that this transaction has already been processed and is no longer valid? The runtime could cross-reference every single transaction in the Solana ledger for duplicates, but this process would be too computationally expensive and time exhaustive. Rather, the runtime enforces a liveness of 150 slots in order to reduce complexity in cross-referencing transactions. If a transaction is replayed or resubmitted, even if it is within the 150 slot liveness window, the blockhash used to validate it will be different from the original.
+
+**Note that the use of blockhashes to enforce uniqueness of signed transactions can result in “Duplicate Transaction” errors** if an identical transaction is submitted to the network in a very small timeframe. In such cases, the runtime will abort these transactions and return the following message: `SendTransactionError **["This transaction has already been processed"](https://solana.stackexchange.com/questions/1161/how-to-avoid-sendtransactionerror-this-transaction-has-already-been-processed)`.** In order to avoid this error, it is best practice to alter the transaction in order to produce a unique signature by 1) ensuring the `recent_blockhash` field is different for otherwise identical transactions, and/or 2) appending an instruction to your transaction’s instructions list, using it as a nonce value. (System self-transfers of monotonically increasing lamports size is a common practice.) By altering the transaction message, you’re altering the transaction signature and circumventing the possibility of a duplicate transaction error.
+
+In short, in order for a transaction to be valid, it must be 1) unique, and 2) exist within a timeframe of 150 slots so the runtime can check for duplicate transactions.
+
+## What Are Durable Nonces?
+
+**Durable Nonces are reusable, long-lived transaction identifiers that can be used to prevent replay attacks, facilitate offline signing, and enable multi-party transaction approvals even when the transaction isn't submitted immediately**. Using Durable Nonces, you can submit a transaction to the network without having to resign or fetch the latest blockhash, removing the mortality of an unexecuted transaction.
+
+The utility of Durable Nonces becomes obvious in use cases that require more time to produce a signature for the transaction. For example: If you're trying to send multiple transactions together in a batch, the time it takes for all the required parties to sign the transactions offline could exceed the liveness window. In this case, Durable Nonces can be used to ensure each transaction is recognized as unique and valid by the runtime, even after the initial 150-slot timeframe has passed.
+
+**Durable Nonces should not be used to optimize transaction landing times or probabilities**. Durable Nonces simply allow you to validate an unexecuted transaction with a static, otherwise expired blockhash. When you want to submit a transaction on the Solana network, the process works as follows: 1) You create the transaction message; 2) You sign the transaction; and 3) You submit the transaction to a Solana cluster, hoping it will be processed by the block leader and included in a block. However, there’s no guarantee that your transaction will be processed whatsoever; your transaction can be outcompeted for block space by other transactions with staked connections or higher priority fees, etc. If your transaction hasn’t landed within a timeframe of 150 slots (i.e., the blockhash expires), the RPC that relayed your transaction will implement retry logic for resubmission. In this case, you would need to fetch a new blockhash, resign the transaction, and submit it again. **Using a durable nonce, however, you can avoid the need to fetch a new blockhash and resign the transaction every time you want to resubmit it**. The durable nonce maintains the transaction's uniqueness and validity, even if the original blockhash has expired.
+
+
+## The Lifetime of Durable Transaction Nonces
+
+### Step 1: Initialize The Nonce Authority
+
+Upon the successful initialization of the Nonce Account via the `InitializeNonceAccount` instruction, the most recent blockhash and Nonce Authority `Pubkey` are stored in the Nonce Account. The `Pubkey`of the Nonce Authority is the only argument that the `InitializeNonceAccount` instruction takes. The Nonce Authority is the entity that can manage the Nonce Account and authorize the use of:
+
+1. **The `AdvanceNonceAccount` Instruction**: This instruction is used to change the nonce value after a Durable Nonce transaction is submitted to the network.
+2. **The `WithdrawNonceAccount` Instruction**: This instruction is used to change the balance of the Nonce Account.
+3. **The `AuthorizeNonceAccount` Instruction**: The account's [nonce authority](https://docs.solanalabs.com/cli/examples/durable-nonce#nonce-authority) can be changed using the `AuthorizeNonceAccount` instruction. It takes one parameter, the `Pubkey` of the new authority. Executing this instruction grants full control over the account and its balance to the new authority.
+
+In order to create a Nonce Authority using the Solana CLI, we must first make sure we’re performing these operations on the devnet so that we’re not spending real SOL for this tutorial:
+
+```bash
+solana config get
+solana config set -u devnet
+```
+
+Now we can create the Nonce Authority by creating a new keypair, marking this as the default keypair in our Solana CLI config, and airdropping the keypair some SOL to sign for transactions:
+
+```bash
+solana-keygen new -o nonce-authority.json 
+solana config set -k ~/<path>/nonce-authority.json
+solana airdrop 1
+```
+
+### Step 2: Initialize The Nonce Account
+
+The Nonce Account is the data account that stores the value of the nonce. This value is used to queue your transaction and replaces the blockhash value in the `recent_blockhash` field of your transaction message. This account is created and owned by the `SystemProgram`and must be rent-exempt upon creation in order to meet the feature’s persistence-requirements. 
+
+Using the Solana CLI, we can create a Nonce Account using the `create-nonce-account` instruction. This instruction will automatically assign your Solana CLI keypair as the Nonce Authority of the Nonce Account. When creating the account, we fund it with lamports so that is is rent-exempt upon creation:
+
+```bash
+solana-keygen new -o nonce-account.json
+solana create-nonce-account nonce-account.json 0.002
+```
+
+To confirm that the Nonce Account was created successfully, you can query its value and details like so:
+
+```bash
+solana nonce nonce-account.json
+solana nonce-account nonce-account.json
+```
+
+### Step 3: Advancing The Nonce Value
+
+When a Solana transaction fails and exits with an `InstructionError`, the signer is still charged a fee for the computational resources consumed on the network. Traditionally, to resubmit a failed transaction, the signer would need to resign the transaction and fetch a new blockhash before broadcasting it again.
+
+However, the introduction of Durable Nonces has changed this dynamic. Durable Nonces allow you to resubmit a transaction without the need to resign or fetch a new blockhash. This added convenience raises an important question: how do you prevent a malicious validator from continuously replaying a failed Durable Nonce transaction, collecting transaction fees in the process? The answer lies in the `AdvanceNonceAccount` instruction.
+
+To prevent a malicious validator from replaying failed Durable Transaction Nonces when these transactions fail with an `InstructionError`, **it is imperative that the first instruction in your transaction message is an `AdvanceNonceAccount` instruction**. The `nonceAdvance` instruction is used to manage the account's stored nonce value and “advance” it when the transaction is processed by the runtime — this way, Durable Nonce Transactions can’t be replayed within the same block. 
+
+Crucially, the `AdvanceNonceAccount` instruction is executed regardless of whether the overall transaction is successfully processed or aborted with an `InstructionError`. **Transactions that attempt to use a nonce account without the nonce advancing will fail**. This means that if a malicious validator attempts to replay a failed Durable Nonce transaction, the nonce value will no longer match, and the Solana runtime will reject the duplicate transaction.
+
+Using the Solana CLI, we can advance the Nonce value using the `new-nonce` instruction. The Nonce Authority needs to sign the transaction with the `nonceAdvance` instruction:
+
+```bash
+solana new-nonce nonce-account.json
+```
+
+You can confirm that the value of the nonce has changed by running the following:
+
+```bash
+solana nonce nonce-account.json
+```
+
+### Step 4: Manage The Nonce Account’s Lamports
+
+The `WithdrawNonceAccount` instruction is used to withdraw funds from the durable nonce account. This instruction takes a single argument, which is the amount of lamports to be withdrawn. This instruction enforces rent-exemption and prevents the account's balance from falling below the rent-exempt minimum. The only exception is if the final balance would be zero, which makes the account eligible for deletion. This account closure detail has an additional requirement that the stored nonce value must not match the cluster's most recent blockhash, as per `AdvanceNonceAccount`.
+
+When we created our Nonce Account, we funded it with 0.002 SOL. Now we’re going to withdraw funds and transfer them back to the Nonce Authority:
+
+```bash
+solana withdraw-from-nonce-account nonce-account.json nonce-authority.json 0.0000001
+```
+
+You can confirm that the balance of the Nonce Account has changed using the following command:
+
+```bash
+solana nonce-account nonce-account.json
+```
+
+## Sending An Offline Transaction Using JavaScript
+
+### Step 1: Create Wallets for Signing Transactions
+
+To get started with creating and signing offline transaction, clone the example repo and its dependencies: 
+
+```jsx
+git clone https://github.com/helius-labs/durable-nonce.git
+cd durable-nonce
+npm i
+```
+
+Once you’re inside the project folder, navigate to the `wallets` folder and create a set of keypairs that you will use to sign transactions. This will include the Nonce Authority and the Signer:
+
+```jsx
+cd wallets
+solana-keygen new -o ./sender.json
+solana config set --keypair ./sender.json
+solana airdrop 1
+solana-keygen new -o ./nonceAuth.json
+solana airdrop 1 <nonceAuth public key>
+```
+
+### Step 2: Setup Your Project
+
+Open the `main.ts` file and import the dependencies and initialize the constant variables in your project file:
+
+```jsx
+import * as web3 from "@solana/web3.js";
+import { Helius } from "helius-sdk";
+
+import { encodeAndWriteTransaction, loadWallet, readAndDecodeTransaction } from "./utils";
+
+// URL of the default Solana cluster (devnet)
+const { connection } = new Helius("https://devnet.helius-rpc.com/?api-key=<api-key>");
+// number of SOL we will transfer in our sample transaction
+const TRANSFER_AMNT = web3.LAMPORTS_PER_SOL * 0.01;
+// amount of time before we send the Durable Nonce transaction
+const DELAY = 120_000;
+
+// keypair for the nonce account
+const NONCE_KEYPAIR = web3.Keypair.generate();
+// keypair for the nonce authority account
+const NONCE_AUTH_KEYPAIR = loadWallet("./wallets/nonceAuth.json");
+// keypair for the sender account
+const SENDER_KEYPAIR = loadWallet("./wallets/sender.json");
+```
+
+### Step 2: Create the `sendTransaction` Function
+
+The **sendTransaction** function orchestrates the process of sending a transaction using a Durable Nonce. This function handles nonce creation, confirmation, and transaction execution. Note that this function calls other functions that we have not yet created:
+
+```jsx
+async function sendTransaction() {
+	console.log("Starting Nonce Transaction")
+	
+  try {
+	  // create the nonce value
+    const nonceCreationTxSig = await createNonce();
+    const confirmationStatus = await connection.confirmTransaction(nonceCreationTxSig);
+    
+    if (!confirmationStatus.value.err) {
+      console.log("Nonce account creation confirmed.");
+
+			// fetch the nonce account info
+      const { nonce } = await fetchNonceInfo();
+      // create the transaction
+      await createTransaction(nonce);
+      // simulate an offline transaction
+      await signOffline(DELAY);
+      // send the transaction
+      await executeTransaction();
+    } else {
+      console.error("Nonce account creation transaction failed:", confirmationStatus.value.err);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+```
+
+### Step 3: Create The `createNonce` Function
+
+The nonce function is responsible for creating and initializing the durable nonce account. This involves calculating the rent required for the account, fetching the latest blockhash, and constructing transactions to both create and initialize the nonce account:
+
+```jsx
+const createNonce = async () => {
+    // calculate the rent for rent exemption
+    const rent = await connection.getMinimumBalanceForRentExemption(web3.NONCE_ACCOUNT_LENGTH);
+
+    // fetch the latest blockhash
+    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+
+    // initialize the transaction
+    const tx = new web3.Transaction();
+    tx.feePayer = nonceAuthority.publicKey;
+    tx.recentBlockhash = blockhash;
+    tx.lastValidBlockHeight = lastValidBlockHeight;
+
+    // add instructions to the transaction
+    tx.add(
+        // create the nonce account
+        web3.SystemProgram.createAccount({
+            fromPubkey: nonceAuthority.publicKey,
+            newAccountPubkey: nonceAccount.publicKey,
+            lamports: rent,
+            space: web3.NONCE_ACCOUNT_LENGTH,
+            programId: web3.SystemProgram.programId
+        }),
+        // initialize the nonce account state
+        web3.SystemProgram.nonceInitialize({
+            noncePubkey: nonceAccount.publicKey,
+            authorizedPubkey: nonceAuthority.publicKey
+        })
+    );
+
+    // sign the transaction
+    tx.sign(nonceAccount, nonceAuthority);
+
+    // send the transaction
+    try {
+        const signature = await connection.sendRawTransaction(tx.serialize());
+        await connection.confirmTransaction({
+            signature,
+            blockhash,
+            lastValidBlockHeight
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+```
+
+### Step 4: Create The `createTransaction` Function
+
+Now, you will create a function that creates a sample transaction containing both the advance nonce instruction and a transfer instruction. It uses the previously fetched nonce to ensure transaction authenticity:
+
+```jsx
+const createTransaction = async (nonce) => {
+	// create a keypair that you will send funds to
+  const destination = Keypair.generate();
+
+	// create the instruction to advnace the nonce value
+  const advanceNonceIx = SystemProgram.nonceAdvance({
+    noncePubkey: nonceKeypair.publicKey,
+    authorizedPubkey: nonceAuthKeypair.publicKey
+  });
+
+	// create the instruction to transfer funds from A to B
+  const transferIx = SystemProgram.transfer({
+    fromPubkey: senderKeypair.publicKey,
+    toPubkey: destination.publicKey,
+    lamports: TranferAmount,
+  });
+
+	// package the instructions, nonce value, and accounts into a transaction
+  const sampleTx = new Transaction();
+  sampleTx.add(advanceNonceIx, transferIx);
+  sampleTx.recentBlockhash = nonce; // Use the nonce fetched earlier
+  sampleTx.feePayer = senderKeypair.publicKey;
+
+	// serialize the transaction and return it
+  const serialisedTx = encodeAndWriteTransaction(sampleTx, "./unsignedTxn.json", false);
+  return serialisedTx;
+};
+```
+
+### Step 5: Create The `SignOffline` Function
+
+Create a function that mimics singing a transaction using a cold storage device. It simulates an offline delay before signing the transaction with both the sender and nonce authority keypairs:
+
+```jsx
+const signOffline = async (waitTime = DELAY): Promise => {
+	// set off a delay to simulate offline signing
+  await new Promise((resolve) => setTimeout(resolve, waitTime));
+  
+  // fetch and decode the serialized durable nonce transaction
+  const unsignedTx = readAndDecodeTransaction("./unsigned.json");
+  
+  // sign with both keys
+  unsignedTx.sign(senderKeypair, nonceAuthKeypair);
+  
+  // serialize the transaction
+  const serialisedTx = encodeAndWriteTransaction(unsignedTx, "./signed.json");
+  return serialisedTx;
+}
+```
+
+### Step 6: Create The `fetchNonceInfo` Function
+
+Next, we will create a helper function that we can use to query the account information of the Nonce Account and confirm that the nonce value was used in the transaction, is up-to-date and is valid:
+
+```jsx
+const fetchNonceInfo = async () => {
+	// retry the fetch query three times in case of failure
+	const retires = 3;
+
+	while (retries > 0) {
+		// query the nonce account's info
+    const { publicKey } = nonceAccount;
+    const accountInfo = await connection.getAccountInfo(publicKey);
+
+    // check that the nonce account exists and return the data
+    if (!accountInfo) throw new Error("Nonce account does not exist");
+    return web3.NonceAccount.fromAccountData(accountInfo.data);
+    
+    retries -= 1;
+    
+    if (retries > 0) {
+      console.log(`Retry fetching nonce in 3 seconds. ${retries} retries left.`);
+      await new Promise(res => setTimeout(res, 3000)); // wait for 3 seconds
+    }
+	}
+};
+```
+
+### Step 7: Create the executeTransaction Function
+
+```jsx
+const executeTransaction = async () => {
+	// decode the serialized signed transaction
+  const signedTx = await readAndDecodeTransaction("./signedTxn.json");
+  
+  // send the transaction to the network
+  const sig = await connection.sendRawTransaction(signedTx.serialize());
+  console.log("Tx sent: ", sig);
+}
+```
+
+### Step 8: Execute The Instructions
+
+Finally, call the sendTransaction function to initiate the transaction process. This function brings together all the previously defined steps to create, sign, and execute a transaction using a durable nonce. Make sure you are located inside of the project folder:
+
+```bash
+ts-node main
+```
+
+Running sendTransaction will populate a transaction signature for a successful transaction. This signature is a critical piece of information for tracking and verifying the transaction on the Solana network.
+
+If you need a finished reference of the code, please refer to the [finished branch of the repository](https://github.com/helius-labs/durable-nonce).

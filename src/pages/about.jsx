@@ -44,7 +44,7 @@ export default function About() {
         <title>About - Nathan Galindo</title>
         <meta
           name="description"
-          content="I’m Nathan Galindo. I live in Houston, Texas, where I design the future."
+          content="I’m Nathan. I'm working on building a more inclusive financial system."
         />
       </Head>
       <Container className="mt-16 sm:mt-32">
@@ -61,19 +61,18 @@ export default function About() {
           </div>
           <div className="lg:order-first lg:row-span-2">
             <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-              I’m Nathan Galindo. I hail from Baylor University, where I design the
-              future.
+              I’m Nathan. I'm working on building a more inclusive financial system
             </h1>
             <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
               <p>
-                At Baylor University, I am an undergraduate studying Information Systems and
-                Business Analytics. I am also a member of the Baylor University Honors College,
-                and hold leadership positions in multiple student organizations, such as:{' '}
-                <a target="_blank" href="https://www.tbcollaborative.rocks/" className='underline dark:hover:text-teal-500'>The Blockchain Collaborative</a> and <a target="_blank" href="https://firstinline.web.baylor.edu/" className='dark:hover:text-teal-500 underline'>the Baylor First In Line Student Association</a>.
+                At Baylor University, I worked as a cybersecurity analyst while studying finance and information systems.
+                Throughout my college career, I worked multiple finance and tech-related internships, including a co-op at Philosophy Group (a Houston-based, boutique hedge fund) and a software engineering role at Helius — one of the fastest growing startups in Silicon Valley.
+
+                While at univeristy, I also held multiple leadership positions in the Baylor Honors College, <a target="_blank" href="https://www.tbcollaborative.rocks/" className='underline dark:hover:text-teal-500'>The Blockchain Collaborative</a> and <a target="_blank" href="https://firstinline.web.baylor.edu/" className='dark:hover:text-teal-500 underline'>the Baylor First In Line Student Association</a>.
               </p>
               <p>
-                Currently, I am conducting research on how NFT technology can enhance financial services, such as electronic invoicing.
-                This is an open-source endeavor, and all contributions are welcome. You can find the project <a target="_blank" href="https://marble-target-926.notion.site/NFT-Analysis-and-Design-Paradigms-Applied-to-Invoicing-and-Receipting-238ffe88d35540bc9081dfb59660b48b" className='dark:hover:text-teal-500 underline'>here</a>.
+                Currently, I am The Co-Founder of <a target="_blank" href="https://vlyss.com" className='dark:hover:text-teal-500 underline'>Vlyss</a>, a multi-disciplenary agency that creates websites that drive sales and conversions for small businesses and startups.
+                I also lead the Developer Relations function at <a target="_blank" href="https://marginfi.com" className='dark:hover:text-teal-500 underline'>MarginFi</a>, one of the largest lending platforms in decentralized finance. As the Lead Developer Relations Engineer, I handle our B2B conversations and oversee all integrations work with other projects. The role allows me to exercise my passion for software development while also utilizing my business savvy and communication skills.
               </p>
             </div>
           </div>

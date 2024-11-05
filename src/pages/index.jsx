@@ -439,19 +439,19 @@ export default function Home({ articles }) {
             Software developer, researcher, and guitarist.
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-            I'm Nathan Galindo, an Honors student at Baylor University. I'm a
-            full-stack software developer who is interested in leveraging blockchain technology
-            to shape the future of financial services.
+            Hey! I'm Nathan, a recent graduate from Baylor University's Honors College and current Lead Developer Relations Engineer at MarginFi.
+            I'm a full-stack software developer with a passion for creating user-focused products.
+            My passions are electric guitar and tennis.
           </p>
           <div className="mt-6 flex gap-6">
             <SocialLink
-              href="https://twitter.com/_zebedee_"
+              href="https://twitter.com/masterzorgon"
               aria-label="Follow on Twitter"
               icon={TwitterIcon}
               target="_blank"
             />
             <SocialLink
-              href="https://github.com/nathanzebedee"
+              href="https://github.com/masterzorgon"
               aria-label="Follow on GitHub"
               icon={GitHubIcon}
               target="_blank"

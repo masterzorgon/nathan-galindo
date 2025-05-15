@@ -27,10 +27,10 @@ const projects = [
     logo: "",
   },
   {
-    name: "Solana Frontend Development Guide",
+    name: "Helius Frontend Development Bootcamp",
     description:
-      "This repository is a web application which guides you through a series of frontend development projects for interfacing with the Solana blockchain. I developed this app to teach The Blockchain Collaborative members about blockchain development.",
-    link: { href: "https://github.com/nathanzebedee/solana-frontend-development", label: "github.com" },
+      "I developed an app and an entire YouTube series to teach people how to develop frontend applications on Solana using Helius tooling.",
+    link: { href: "https://www.youtube.com/watch?v=8azRe9PRLg0&list=PLMZny7wGLM6w4t7pMGATxFTjjMduTsEiF", label: "YouTube" },
     logo: ""
   },
   {
@@ -74,12 +74,12 @@ export default function Projects() {
         <title>Projects - Nathan Galindo</title>
         <meta
           name="description"
-          content="Things I’ve made trying to put my dent in the universe."
+          content="My projects over the years."
         />
       </Head>
       <SimpleLayout
-        title="Things I’ve made trying to put my dent in the universe."
-        intro="I’ve worked on tons of little projects over the years but these are the ones that I’m most proud of. Many of them are open-source, so if you see something that piques your interest, check out the code and contribute if you have ideas for how it can be improved."
+        title="My projects over the years."
+        intro="Many of them are open-source, so if you see something that piques your interest, check out the code and contribute if you have ideas for how it can be improved."
       >
         <ul
           role="list"

@@ -65,14 +65,11 @@ export default function About() {
             </h1>
             <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
               <p>
-                At Baylor University, I worked as a cybersecurity analyst while studying finance and information systems.
-                Throughout my college career, I worked multiple finance and tech-related internships, including a co-op at Philosophy Group (a Houston-based, boutique hedge fund) and a software engineering role at Helius — one of the fastest growing startups in Silicon Valley.
+                I'm a generalist currently working on building a more inclusive financial system. I am always trying new things and exploring new ideas. Recently, I've grown to love yoga and long distance running.
 
-                While at univeristy, I also held multiple leadership positions in the Baylor Honors College, <a target="_blank" href="https://www.tbcollaborative.rocks/" className='underline dark:hover:text-teal-500'>The Blockchain Collaborative</a> and <a target="_blank" href="https://firstinline.web.baylor.edu/" className='dark:hover:text-teal-500 underline'>the Baylor First In Line Student Association</a>.
-              </p>
-              <p>
-                Currently, I am The Co-Founder of <a target="_blank" href="https://vlyss.com" className='dark:hover:text-teal-500 underline'>Vlyss</a>, a multi-disciplenary agency that creates websites that drive sales and conversions for small businesses and startups.
-                I also lead the Developer Relations function at <a target="_blank" href="https://marginfi.com" className='dark:hover:text-teal-500 underline'>MarginFi</a>, one of the largest lending platforms in decentralized finance. As the Lead Developer Relations Engineer, I handle our B2B conversations and oversee all integrations work with other projects. The role allows me to exercise my passion for software development while also utilizing my business savvy and communication skills.
+                I've been working in the Solana ecosystem for over 3 years, and I've worked as an early employee for some of the most exciting projects in the ecosystem, namely <a target="_blank" href="https://www.helius.dev/" className='underline dark:hover:text-teal-500'>Helius</a> and <a target="_blank" href="https://marginfi.com/" className='underline dark:hover:text-teal-500'>marginfi</a>.
+
+                I believe that you should do what you say you're going to do, and that you should always be learning. I try to live by these values every day.
               </p>
             </div>
           </div>
@@ -88,11 +85,11 @@ export default function About() {
                 Follow on LinkedIn
               </SocialLink>
               <SocialLink
-                href="mailto:nathan_galindo1@baylor.edu"
+                href="mailto:nathan.zebedee@gmail.com"
                 icon={MailIcon}
                 className="mt-8 border-t border-zinc-100 pt-8 dark:border-zinc-700/40"
               >
-                nathan_galindo1@baylor.edu
+                Send me an email
               </SocialLink>
             </ul>
           </div>

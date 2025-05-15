@@ -54,7 +54,7 @@ export default function ArticlesIndex({ articles }) {
         />
       </Head>
       <SimpleLayout
-        title="Writing on software, blockchain, and other interests."
+        title="Writing on technology and other interests."
         intro="Any and all content on this website is produced for educational and inspirational purposes only. Nothing on this website should be considered financial advice. I do not sanction or encourage the deployment of applications that violate applicable laws or regulations."
       >
         <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">

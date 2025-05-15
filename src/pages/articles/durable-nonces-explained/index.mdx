@@ -1,14 +1,6 @@
 import { ArticleLayout } from '@/components/ArticleLayout'
 import Image from 'next/image'
 
-import coverPhoto from './cover.png'
-import aboutPhoto from './about.png'
-import aid01 from './01.png'
-import aid02 from './02.png'
-import aid03 from './03.png'
-import aid04 from './04.png'
-import aid05 from './05.png'
-
 export const meta = {
   author: 'Nathan Galindo',
   date: '2024-04-13',
@@ -40,7 +32,13 @@ By the end of this article, you will understand 1) The validity requirements of 
 
 **The enforced mortality and uniqueness of submitted transactions is a safeguard against replay attacks, or double-spend transactions**. A replay attack is when a valid transaction is maliciously replayed (resubmitted) multiple times, resulting in the same action being performed repeatedly (e.g., the transfer of funds). For example: If you send your friend 1 SOL, what is stopping your friend from resubmitting this transfer transaction to the network and draining your wallet? How does the runtime know that this transaction has already been processed and is no longer valid? The runtime could cross-reference every single transaction in the Solana ledger for duplicates, but this process would be too computationally expensive and time exhaustive. Rather, the runtime enforces a liveness of 150 slots in order to reduce complexity in cross-referencing transactions. If a transaction is replayed or resubmitted, even if it is within the 150 slot liveness window, the blockhash used to validate it will be different from the original.
 
-**Note that the use of blockhashes to enforce uniqueness of signed transactions can result in “Duplicate Transaction” errors** if an identical transaction is submitted to the network in a very small timeframe. In such cases, the runtime will abort these transactions and return the following message: `SendTransactionError **["This transaction has already been processed"](https://solana.stackexchange.com/questions/1161/how-to-avoid-sendtransactionerror-this-transaction-has-already-been-processed)`.** In order to avoid this error, it is best practice to alter the transaction in order to produce a unique signature by 1) ensuring the `recent_blockhash` field is different for otherwise identical transactions, and/or 2) appending an instruction to your transaction’s instructions list, using it as a nonce value. (System self-transfers of monotonically increasing lamports size is a common practice.) By altering the transaction message, you’re altering the transaction signature and circumventing the possibility of a duplicate transaction error.
+**Note that the use of blockhashes to enforce uniqueness of signed transactions can result in “Duplicate Transaction” errors** if an identical transaction is submitted to the network in a very small timeframe. In such cases, the runtime will abort these transactions and return the following message: 
+
+> SendTransactionError: ["This transaction has already been processed"](https://solana.stackexchange.com/questions/1161/how-to-avoid-sendtransactionerror-this-transaction-has-already-been-processed). 
+
+In order to avoid this error, it is best practice to alter the transaction in order to produce a unique signature by
+1. Ensuring the `recent_blockhash` field is different for otherwise identical transactions, and/or
+2. Appending an instruction to your transaction’s instructions list, using it as a nonce value. (System self-transfers of monotonically increasing lamports size is a common practice.) By altering the transaction message, you’re altering the transaction signature and circumventing the possibility of a duplicate transaction error.
 
 In short, in order for a transaction to be valid, it must be 1) unique, and 2) exist within a timeframe of 150 slots so the runtime can check for duplicate transactions.
 

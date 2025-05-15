@@ -50,7 +50,6 @@ The utility of Durable Nonces becomes obvious in use cases that require more tim
 
 **Durable Nonces should not be used to optimize transaction landing times or probabilities**. Durable Nonces simply allow you to validate an unexecuted transaction with a static, otherwise expired blockhash. When you want to submit a transaction on the Solana network, the process works as follows: 1) You create the transaction message; 2) You sign the transaction; and 3) You submit the transaction to a Solana cluster, hoping it will be processed by the block leader and included in a block. However, there’s no guarantee that your transaction will be processed whatsoever; your transaction can be outcompeted for block space by other transactions with staked connections or higher priority fees, etc. If your transaction hasn’t landed within a timeframe of 150 slots (i.e., the blockhash expires), the RPC that relayed your transaction will implement retry logic for resubmission. In this case, you would need to fetch a new blockhash, resign the transaction, and submit it again. **Using a durable nonce, however, you can avoid the need to fetch a new blockhash and resign the transaction every time you want to resubmit it**. The durable nonce maintains the transaction's uniqueness and validity, even if the original blockhash has expired.
 
-
 ## The Lifetime of Durable Transaction Nonces
 
 ### Step 1: Initialize The Nonce Authority

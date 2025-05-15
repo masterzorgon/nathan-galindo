@@ -1,9 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import clsx from 'clsx'
 
-import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
 import { Container } from '@/components/Container'
 import {
@@ -11,11 +9,6 @@ import {
   LinkedInIcon,
   TwitterIcon,
 } from '@/components/SocialIcons'
-
-// LOGOS
-import logoBaylor from '@/images/logos/baylor.png'
-import logoPhilosophy from '@/images/logos/philosophy.jpeg'
-import logoSolana from '@/images/logos/solana.jpeg'
 
 import logoReact from '@/images/logos/react.svg'
 import logoNest from '@/images/logos/nest.png'
@@ -307,8 +300,6 @@ export default function Home({ articles }) {
             ))}
           </div>
           <div className="space-y-10 lg:pl-16 xl:pl-24">
-            {/* <Newsletter /> */}
-            {/* <Resume /> */}
             <Frameworks />
             <Languages />
           </div>

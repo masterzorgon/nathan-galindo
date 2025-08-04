@@ -4,7 +4,7 @@ import Image from 'next/image'
 export const meta = {
   author: 'Nathan Galindo',
   date: '2025-05-16',
-  title: 'Concentrated AMMs vs. Order Books',
+  title: 'The Evolutions of AMMs: ',
   tag: "blockchain",
   description:
     'wip...',
@@ -12,6 +12,75 @@ export const meta = {
 
 export default (props) => <ArticleLayout meta={meta} {...props} />
 
+<Note>
+this article is under construction.
+</Note>
+
+the incenption of AMMs
+concentrated liquidity AMMs
+dark AMMs
+proprietary AMMs
+
 ## Introduction
 
-wip...
+Order books and AMMs are fundamentally different market structures that satisfy different use cases and different types of users.
+An order book matching engine is just one of the three most common DEX market structures, the others being the automated market making model (more on this later) and the Dutch auction model. In this article, we will review the origination and unique properties of order book and AMM mechanisms, comparing them in the process.
+
+## Order Books: The Traditional Matching engine
+
+ideally, order books are most optimal when actively used by traders. for this reason, market makers are big fans of order books and provide liquidity to reduce the size of the spread. market makers are compensated for taking inventory risk. this is because when order books have lower trading volume, they have wider spreads and worse price discovery since there is greater illiquidity risk assumed by market makers.
+that being said, order books are good for liquid markets with large trading volume. in this scenario, order books are good for placing large orders with minimal slippage. for this reason, large centralized exchanges such as Coinbase, Binance and the NYSE, rely on the order book model.
+
+on the contrary, order books are unideal in illiquid markets, as an order book with low trading volume and poorer liquidity will have wider spreads, where the highest bid (order to buy) might stil be lower than the lowest ask (order to sell).
+
+the biggest problem facing on-chain order book DEXs is front-running. Front-running is the process of observing transactions as their submitted to the network and inserting bids in front of larger buy orders to profit of the resulting price impact.
+other abuses that order book DEXs are susceptible to are pump and dumps, spoofing and wash trading. these abuses ultimately create unstable market conditiona and inflated volumes across exchanges. Although centralized exchanges like the NYSE have strict laws to regulate this kind of misbhavior, the permissionless nature of decentralized DEXs make it harder to counteract these abuses. thus, a technical solution — as opposed to a legal solution — is required to solve on-chain market manipulation.
+
+⚡️ the origin of order books
+
+⚡️ the use of order books in DeFi
+
+⚡️ the difficulty of building an order book in EVM
+
+⚡️ examples of "poor man's order book" on EVM
+
+⚡️ why order book DEXs succeed on solana
+
+## AMMs: The Need for Automated Market Makers
+
+the AMM mechanism is fundamentally different from an order book. AMMs are pool-based, whereas order books explicitly specify the prices buyers/sellers want to trade at. 
+in an order book, a larger number of buy orders may indicate rising buying pressure, where the buy/sell walls (peaks on either side) indicate which prices traders are willing to trade at.
+AMMs pool liq together and makes a market according to a predefined formula. diff AMMs use diff formulas.
+AMMs pair
+
+anyone can LP into these AMM pools and earn fees from the trading activity that occurs within these markets. that being said, the AMMs need two tokens to create a market: LPs deposit both tokens to provide liquidity for traders to swap between these two tokens.
+in an orderbook, your trade only executes when your bid matches an ask. in an AMM, you just trade within the pool — no need to wait for a counterparty.
+
+AMMs are especially useful in illiquid/fragmented markets. 
+
+⚡️ the need for AMMs; the origin of AMMs
+
+⚡️ the rise of concentrated AMMs and examples
+
+⚡️ why LP asset ratios change
+
+⚡️ impermanent loss and other risks when LP'ing
+
+⚡️ price discovery compared to order books
+
+## Do We Need Order Books?
+
+⚡️ market makers say yes (eg, wintermute, jump)
+
+⚡️ unnessecary for liquidity formation and price discovery
+
+
+AMMs are a DeFi-native innovation that allow users to participate in volatility harvesting without requiring large capital or complex options spreads.
+AMMs are generally passive while order book mechanisms are active, requiring the trader to manage limit and stop orders.
+
+
+Central limit order books are a type of (electronic) matching engine that match buy and sell orders for an asset. 
+First proposed by the Securities and Exchange Commission (SEC) in 2000, order books are now used by almost every exchange for a wide breadth of asset types: stocks, bonds and even digital assets.
+An order book is considered "passive infrastructure," meaning they don't generate liquidity on their own. They require active market participants to contribute flow to the matching engine. These participants are referred to as "Makers" and "Takers". Makers are users who post limit orders (e.g., "Sell 1 $TSLA at $120); Takers are users who place market orders that match with existing offers (e.g., "Buy 1 $TSLA at $120).
+For a order book to work well, it needs limit orders and liquidity at many different prices, and constant updates to reflect the latest asset price. Without constant order flow, the order book will give the traders wide spreads, poor price discovery and higher slippage.
+
